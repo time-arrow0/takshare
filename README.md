@@ -1,6 +1,38 @@
 
 东财封IP，替代方案：
-1. 雪球
+这里主要说的是日K数据
+分为2类数据，
+1. 需要程序每日自动获取的数据，每天都要运行，所以需要程序自动获取，较复杂
+2. 回测用的数据，就算没有合适的API，也可以手动操作，一次获取10年的数据就够用了
+
+## 需要程序每日自动获取的数据，API
+新浪K线数据接口
+url = "https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20x=/CN_MarketDataService.getKLineData"
+params = {
+    "symbol": symbol,
+    "scale": "240",  # 240分钟，即日线
+    "datalen": str(count),  # 数据条数
+    "ma": "no"
+}
+
+2025年十大股票数据API接口实测推荐，包括雅虎、同花顺、XTick、东方财富 - XTick的文章 - 知乎
+https://zhuanlan.zhihu.com/p/1963564455280477300
+
+必盈数据
+https://www.biyingapi.com/
+
+智兔数服
+https://www.zhituapi.com/index.html
+
+聚合数据
+https://www.juhe.cn/
+
+沧海数据
+tsanghi.com
+哪里能找到A股实时数据接口？ - 沧海数据的回答 - 知乎
+https://www.zhihu.com/question/624901121/answer/51821087276
+
+雪球 - 还是要cookie，和东财问题一样
 访问示例：
 https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SZ159915&period=day&type=before&count=-10&indicator=kline&begin=1735660800000
 参数说明：
@@ -9,10 +41,24 @@ period: 周期（day=日线, week=周线, month=月线）
 count: 数据条数（负号表示获取之前的数据）
 begin: 起始时间戳（毫秒级）
 indicator: 指标类型
-2. 中华财经网
+
+中华财经网 - 不清楚如何爬取
 https://www.cnfin.com/quote/index.html
 
 关注b站up：量化鸭
+
+
+## 回测用数据
+
+通达信下载
+单个标的的历史数据，按下键显示出所有时间范围的数据后，点击数据导出，就能够导出。
+如果要下载多只标的历史数据，要先点击“选项”-》“盘后数据下载”，选择“日线和实时行情数据”，选择时间段，点击下载，
+下载成功后，点击“选项”-》“数据导出”，在弹出窗口中点击“高级导出”，选择复权方式，添加品种，点击导出。
+导出文件的编码都是GBK或者GB18030。
+
+新浪api
+akshare.fund_etf_hist_sina
+
 
 
 
