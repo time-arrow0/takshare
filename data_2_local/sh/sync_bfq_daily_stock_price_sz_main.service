@@ -1,5 +1,5 @@
 [Unit]
-Description=bfq_daily_stock_price_sz_main daily sync script service
+Description=bfq_daily_stock_price_sz_main sync service
 
 [Service]
 Type=oneshot
