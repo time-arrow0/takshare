@@ -279,9 +279,7 @@ def data_2_local():
     # 这个接口返回的数据成交量单位是"100"，需要乘以100
     df['volume'] = df['volume'] * 100
     df_append_2_local(table_name=table_name, df=df)
-    LOGGER.info(f'{current_date}同步数据完成')
-
-
+    LOGGER.info(f'{current_date}同步数据完成, 数据条数: {df.shape[0]}')
 
 
 
