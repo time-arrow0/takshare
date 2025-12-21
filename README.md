@@ -60,6 +60,15 @@ https://www.cnfin.com/quote/index.html
 akshare.fund_etf_hist_sina
 
 
+### db_config.ini格式
+config/db_config.ini格式
+[database]
+host = xx
+port = xx
+user = xx
+password = xx
+database = db_name
+charset = utf8mb4
 
 
 
