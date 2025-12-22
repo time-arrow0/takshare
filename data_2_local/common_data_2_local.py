@@ -3,6 +3,7 @@ import logging
 import traceback
 from contextlib import contextmanager
 
+import pandas as pd
 from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
@@ -51,6 +52,21 @@ def get_db_session():
     finally:
         session.close()  # 无论如何都关闭Session
 
+def obtain_middle_small_delisted_stock_code_list():
+    table_name = 'delisted_middle_small'
+    try:
+        with get_db_session() as session:
+            result = session.execute(text(f"SELECT code FROM {table_name}"))
+            codes = [row[0] for row in result]
+            return codes
+    except Exception as e:
+        print(f"获取退市中小板代码时出错 {table_name}: {e}")
+        raise
+
+def obtain_middle_small_delisted_stock_code_set():
+    delisted_stock_code_list = obtain_middle_small_delisted_stock_code_list()
+    delisted_stock_code_set = set(delisted_stock_code_list)
+    return delisted_stock_code_set
 
 def get_price_last_date(table_name, code):
     """
@@ -90,6 +106,19 @@ def get_price_max_date(table_name):
     except Exception as e:
         print(f"获取最大日期时出错 {table_name}: {e}")
         raise
+
+def obtain_code_max_date_timestamps(table_name, code_column, date_column):
+    """
+    返回dataframe，code列，date列
+    """
+    # 价格数据查询。前复权数据，早期数据涨跌幅列无意义
+    query_sql = f"""
+    SELECT {code_column} AS code, MAX({date_column}) AS date
+    FROM {table_name}
+    GROUP BY {code_column}
+    """
+    df = pd.read_sql(query_sql, engine)
+    return df
 
 def df_append_2_local(table_name, df):
     try:
