@@ -31,7 +31,28 @@ def remove_empty(str_list):
             result.append(s)
     return result
 
+def obtain_em_not_contains_codes():
+    """
+    东财接口没有包括的代码，后续用同花顺接口同步
+    """
+    with open(file='data/stock_fhps_detail_em_2_local/em_not_contains_codes.txt', mode='r', encoding='utf-8') as f:
+        content = f.read()
+        codes = remove_empty(content.split('\n'))
+        return codes
 
+def obtain_em_failed_codes():
+    """
+    东财接口没有包括的代码，后续用同花顺接口同步
+    """
+    with open(file='data/stock_fhps_detail_em_2_local/failed_codes.txt', mode='r', encoding='utf-8') as f:
+        content = f.read()
+        codes = remove_empty(content.split('\n'))
+        return codes
+
+def obtain_reject_code_set():
+    """剔除掉的代码"""
+    # 未上市或者数据过少接口取不到
+    return {'688809', '688805', '301687', '001396', '001369'}
 
 def initial_stock_fhps_detail_ths_2_local():
     """
@@ -42,16 +63,22 @@ def initial_stock_fhps_detail_ths_2_local():
     #     stock_codes = remove_empty(content.split('\n'))
     #     print(len(stock_codes))
     # 已退市中小板股票
-    stock_codes = obtain_middle_small_delisted_stock_code_list()
+    # stock_codes = obtain_middle_small_delisted_stock_code_list()
+    # 东财接口没有包括的代码，这里用同花顺接口同步
+    stock_codes = obtain_em_not_contains_codes()
     with open(file='data/stock_fhps_detail_ths_2_local/complete_codes.txt', mode='r', encoding='utf-8') as f:
         content = f.read()
         complete_codes = remove_empty(content.split('\n'))
         print(len(complete_codes))
     complete_code_set = set(complete_codes)
+    # 不考虑的代码
+    reject_code_set = obtain_reject_code_set()
     # 去掉已经同步过的，退市的
     codes = []
     for code in stock_codes:
         if code in complete_code_set:
+            continue
+        if code in reject_code_set:
             continue
         codes.append(code)
     print(f'len_codes: {len(codes)}')
@@ -70,28 +97,50 @@ def initial_stock_fhps_detail_ths_2_local():
         'A股股权登记日': 'equity_record_date',
         'A股除权除息日': 'ex_dividend_date',
         '分红总额': 'total_dividend',
+        'AH分红总额': 'total_dividend_ah',
         '方案进度': 'plan_progress',
         '股利支付率': 'dividend_payout_ratio',
         '税前分红率': 'pretax_dividend_yield'
     }
+    table_column_set = {'report_period', 'board_meeting_date', 'shareholders_meeting_announcement_date', 'implementation_announcement_date', 'dividend_plan_description', 'equity_record_date', 'ex_dividend_date', 'total_dividend', 'plan_progress', 'dividend_payout_ratio', 'pretax_dividend_yield'}
     # codes = ['002002']
     for code in codes:
         try:
             df = ak.stock_fhps_detail_ths(symbol=code)
+            if df.shape[0] == 0:
+                with open(file='data/stock_fhps_detail_ths_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
+                    f.write(f'{code}\n')
+                LOGGER.info(f'{code}未获取到分红数据, 跳过')
+                continue
             df = df.rename(columns=column_mapping)
+            column_set = set(df.columns)
+            if 'report_period' not in column_set:
+                with open(file='data/stock_fhps_detail_ths_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
+                    f.write(f'{code}\n')
+                LOGGER.info(f'{code}数据缺少报告期列, 跳过')
+                continue
+            for column in column_set:
+                if column not in table_column_set:
+                    df = df.drop(column, axis=1)
+            if 'board_meeting_date' in column_set:
+                df['board_meeting_date'] = pd.to_datetime(df['board_meeting_date'])
+            if 'shareholders_meeting_announcement_date' in column_set:
+                df['shareholders_meeting_announcement_date'] = pd.to_datetime(df['shareholders_meeting_announcement_date'])
+            if 'implementation_announcement_date' in column_set:
+                df['implementation_announcement_date'] = pd.to_datetime(df['implementation_announcement_date'])
+            if 'equity_record_date' in column_set:
+                df['equity_record_date'] = pd.to_datetime(df['equity_record_date'])
+            if 'ex_dividend_date' in column_set:
+                df['ex_dividend_date'] = pd.to_datetime(df['ex_dividend_date'])
             df['code'] = code
-            df['board_meeting_date'] = pd.to_datetime(df['board_meeting_date'])
-            df['shareholders_meeting_announcement_date'] = pd.to_datetime(df['shareholders_meeting_announcement_date'])
-            df['implementation_announcement_date'] = pd.to_datetime(df['implementation_announcement_date'])
-            df['equity_record_date'] = pd.to_datetime(df['equity_record_date'])
-            df['ex_dividend_date'] = pd.to_datetime(df['ex_dividend_date'])
             df_append_2_local(table_name=TABLE_NAME, df=df)
             with open(file='data/stock_fhps_detail_ths_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
                 f.write(f'{code}\n')
         except Exception as e:
             with open(file='data/stock_fhps_detail_ths_2_local/failed_codes.txt', mode='a', encoding='utf-8') as f:
                 f.write(f'{code}\n')
-            print(e)
+            print(f'{code}-{e}')
+            raise
         time.sleep(0.5)
     
 def daily_adjust_factor_2_local():
