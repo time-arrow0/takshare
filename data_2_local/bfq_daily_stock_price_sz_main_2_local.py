@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, date
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -50,7 +50,7 @@ def get_file_name(code, delisted_stock_code_set):
     return file_name
 
 
-def get_file_data(code, greater_date_ts=None, delisted_stock_code_set=None):
+def get_file_data(code, greater_date_ts=None, eq_date_ts=None, delisted_stock_code_set=None):
     if delisted_stock_code_set is None:
         delisted_stock_code_set = {}
     file_name = get_file_name(code, delisted_stock_code_set)
@@ -84,6 +84,8 @@ def get_file_data(code, greater_date_ts=None, delisted_stock_code_set=None):
     df['date'] = pd.to_datetime(df['date'])
     if greater_date_ts is not None:
         df = df[df['date'] > greater_date_ts]
+    if eq_date_ts is not None:
+        df = df[df['date'] == eq_date_ts]
     return df
 
 def initial_tdx_file_data_2_local():
@@ -91,7 +93,6 @@ def initial_tdx_file_data_2_local():
         content = f.read()
         delisted_stock_code_list = content.split('\n')
         delisted_stock_code_set = set(delisted_stock_code_list[1:])
-
     with open(file='data/bfq_daily_stock_price_sz_main_2_local/399101_codes.txt', mode='r', encoding='utf-8') as f:
         content = f.read()
         stock_codes = content.split('\n')
@@ -109,15 +110,16 @@ def initial_tdx_file_data_2_local():
     # t_codes = ['002003']
     print(f'len_t_codes: {len(codes)}')
 
+    eq_date_ts = pd.Timestamp(date(2025, 12, 22))
     for code in codes:
-        df = get_file_data(code, None, delisted_stock_code_set)
+        df = get_file_data(code, greater_date_ts=None, eq_date_ts=eq_date_ts, delisted_stock_code_set=delisted_stock_code_set)
         df_append_2_local(table_name='bfq_daily_stock_price_sz_main', df=df)
         with open(file='data/bfq_daily_stock_price_sz_main_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
             f.write(f'{code}\n')
 
 def tdx_file_data_2_local():
     # 逐个读取目标目录文件，查表中该代码最大日期，把大于最大日期的数据写入数据库
-    directory = 'D:/new_tdx/T0002/export/bfq-399101-20251218'
+    directory = 'D:/new_tdx/T0002/export/bfq-399101-20251222'
     items = os.listdir(directory)
     dtype_dict = {
         'open': 'float64',
@@ -155,11 +157,13 @@ def tdx_file_data_2_local():
             df = df[['date', 'open', 'high', 'low', 'close', 'volume']]
             df['code'] = code
             df['date'] = pd.to_datetime(df['date'])
-            last_date = get_price_last_date(table_name, code)
-            last_date_ts = pd.Timestamp(last_date)
+            # last_date = get_price_last_date(table_name, code)
+            # last_date_ts = pd.Timestamp(last_date)
             # print(last_date)
-            if last_date is not None:
-                df = df[df['date'] > last_date_ts]
+            # if last_date is not None:
+            #     df = df[df['date'] > last_date_ts]
+            eq_date_ts = pd.Timestamp(date(2025, 12, 22))
+            df = df[df['date'] == eq_date_ts]
             if df.shape[0] > 0:
                 df_append_2_local(table_name=table_name, df=df)
             with open(file='data/bfq_daily_stock_price_sz_main_2_local/complete_codes_tdx_file_data_2_local.txt', mode='a',
@@ -285,6 +289,6 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # initial_tdx_file_data_2_local()
-    # tdx_file_data_2_local()
-    data_2_local()
+    tdx_file_data_2_local()
+    # data_2_local()
     # LOGGER.info('xxx')
