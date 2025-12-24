@@ -1,0 +1,10 @@
+[Unit]
+Description=Run sync_stock_fhps_detail_em.sh periodically
+
+[Timer]
+# 每周五18:01
+OnCalendar=Fri 18:01:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
