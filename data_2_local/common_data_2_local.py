@@ -9,9 +9,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from utils.db_utils import get_db_url
+from utils.log_utils import setup_logger_simple_msg
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+LOGGER = setup_logger_simple_msg(name='common_data_2_local')
 
 DATABASE_URL = get_db_url()
 # 创建数据库引擎
@@ -47,7 +47,7 @@ def get_db_session():
         session.commit()  # 如果代码块没有异常，提交事务
     except Exception as e:
         session.rollback()  # 如果有异常，回滚事务
-        logger.error(f"数据库操作失败: {e}")
+        # LOGGER.error(f"数据库操作失败: {e}")
         raise  # 重新抛出异常
     finally:
         session.close()  # 无论如何都关闭Session
@@ -120,8 +120,19 @@ def obtain_code_max_date_timestamps(table_name, code_column, date_column):
     df = pd.read_sql(query_sql, engine)
     return df
 
-def df_append_2_local(table_name, df):
+def df_append_2_local(table_name, df, table_column_set=None):
+    """
+    如果传了table_column_set，不在table_column_set中的列会被删掉，避免插入报错
+    """
     try:
+        if table_column_set:
+            columns = df.columns
+            for column in columns:
+                if column not in table_column_set:
+                    df.drop(column, axis=1, inplace=True)
+            if len(df.columns) == 0:
+                LOGGER.info('df没有和表中相同的列')
+                return None
         with get_db_session() as session:
             try:
                 # 使用session的connection
@@ -141,7 +152,6 @@ def df_append_2_local(table_name, df):
                 # 不需要显式rollback，上下文管理器会自动处理
                 print(f"插入数据时出错: {e}")
                 raise e  # 重新抛出异常，让外层捕获
-
     except SQLAlchemyError as e:
         print(f"数据库错误: {e}")
         traceback.print_exc()
