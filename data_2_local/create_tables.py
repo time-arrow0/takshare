@@ -438,7 +438,7 @@ def create_code_name_change_table():
 
 def create_index_stocks_399101_table():
     """
-    股票曾用名变化表
+    399101的成分股
     """
     table_name = 'index_stocks_399101'
     try:
@@ -448,6 +448,86 @@ def create_index_stocks_399101_table():
             `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
             PRIMARY KEY (id)
         )  COMMENT = '指数成分股_399101';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stocks_sh_main():
+    """
+    股票列表-沪市主板
+    """
+    table_name = 'stocks_sh_main'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '股票列表-沪市主板';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stocks_sh_kc():
+    """
+    股票列表-沪市科创板
+    """
+    table_name = 'stocks_sh_kc'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '股票列表-沪市科创板';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stocks_sz_main():
+    """
+    股票列表-深市主板
+    """
+    table_name = 'stocks_sz_main'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '股票列表-深市主板';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stocks_sz_cy():
+    """
+    股票列表-深市创业板
+    """
+    table_name = 'stocks_sz_cy'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '股票列表-深市创业板';
         """
         with engine.begin() as connection:
             connection.execute(text(create_sql))
@@ -500,7 +580,7 @@ def create_stock_fhps_detail_em():
                 `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
                 `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
                 `report_period` DATE NOT NULL   COMMENT '报告期' ,
-                `performance_disclosure_date` DATE NOT NULL   COMMENT '业绩披露日期' ,
+                `performance_disclosure_date` DATE   COMMENT '业绩披露日期' ,
                 `total_bonus_ratio` DECIMAL(10, 6)    COMMENT '送转股份-送转总比例' ,
                 `bonus_ratio` DECIMAL(10, 6)    COMMENT '送转股份-送股比例' ,
                 `conversion_ratio` DECIMAL(10, 6)    COMMENT '送转股份-转股比例' ,
@@ -523,10 +603,10 @@ def create_stock_fhps_detail_em():
             )  COMMENT = '分红配送详情-东财, akshare.stock_fhps_detail_em';
             """
         idx_0_sql = f"""
-            CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, ex_dividend_date);
+            CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, report_period);
             """
         idx_1_sql = f"""
-        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(ex_dividend_date);
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(report_period);
         """
         with engine.begin() as connection:
             connection.execute(text(create_sql))
@@ -548,13 +628,14 @@ def create_stock_fhps_detail_ths():
                 `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
                 `code` CHAR(6) NOT NULL COMMENT '股票代码' ,
                 `report_period` VARCHAR(10) NOT NULL COMMENT '报告期' ,
-                `board_meeting_date` DATE NOT NULL COMMENT '董事会日期' ,
+                `board_meeting_date` DATE COMMENT '董事会日期',
                 `shareholders_meeting_announcement_date` DATE COMMENT '股东大会预案公告日期' ,
                 `implementation_announcement_date` DATE COMMENT '实施公告日' ,
                 `dividend_plan_description` VARCHAR(80) COMMENT '分红方案说明' ,
                 `equity_record_date` DATE COMMENT 'A股股权登记日' ,
                 `ex_dividend_date` DATE COMMENT 'A股除权除息日' ,
                 `total_dividend` VARCHAR(30) COMMENT '分红总额' ,
+                `total_dividend_ah` VARCHAR(30) COMMENT 'AH分红总额',
                 `plan_progress` VARCHAR(30) COMMENT '方案进度' ,
                 `dividend_payout_ratio` VARCHAR(15) COMMENT '股利支付率' ,
                 `pretax_dividend_yield` VARCHAR(10) COMMENT '税前分红率' ,
@@ -563,10 +644,10 @@ def create_stock_fhps_detail_ths():
             )  COMMENT = '分红情况-同花顺, akshare.stock_fhps_detail_ths';
              """
         idx_0_sql = f"""
-            CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, ex_dividend_date);
+            CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, report_period);
             """
         idx_1_sql = f"""
-        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(ex_dividend_date);
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(report_period);
         """
         with engine.begin() as connection:
             connection.execute(text(create_sql))
@@ -592,6 +673,7 @@ def create_dividend():
                     `share_giving_count` DECIMAL(10, 6)    COMMENT '送股数-10送x股' ,
                     `share_conversion_count` DECIMAL(10, 6)    COMMENT '转股数-10转x股' ,
                     `cash_dividend` DECIMAL(10, 6)    COMMENT '现金分红-10派x元' ,
+                    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     PRIMARY KEY (id)
                 )  COMMENT = '分红数据, 只记录除权除息日的分红情况';
                 """
@@ -877,7 +959,12 @@ if __name__ == '__main__':
     # create_stock_listing_date_table()
     # create_bfq_daily_etf_price_table()
 
-    create_dividend()
+    # create_dividend()
     # create_stock_fhps_detail_em()
     # create_stock_fhps_detail_ths()
     # create_delisted_middle_small()
+
+    create_stocks_sh_main()
+    create_stocks_sh_kc()
+    create_stocks_sz_main()
+    create_stocks_sz_cy()
