@@ -10,10 +10,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from utils.db_utils import get_db_url
-
+from utils.log_utils import setup_logger_simple_msg
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+LOGGER = setup_logger_simple_msg(name='dao')
 
 DATABASE_URL = get_db_url()
 # 创建数据库引擎
@@ -48,7 +48,7 @@ def get_db_session():
         session.commit()  # 如果代码块没有异常，提交事务
     except Exception as e:
         session.rollback()  # 如果有异常，回滚事务
-        logger.error(f"数据库操作失败: {e}")
+        # LOGGER.error(f"数据库操作失败: {e}")
         raise  # 重新抛出异常
     finally:
         session.close()  # 无论如何都关闭Session
@@ -70,3 +70,37 @@ def obtain_value_by_sql(sql: str) -> int:
         result = session.execute(text(sql))
         v = result.scalar()
         return v
+
+def obtain_list_by_sql(sql: str):
+    """
+    从数据库获取单个值
+    """
+    with get_db_session() as session:
+        # 使用 text() 执行原生 SQL 查询
+        result = session.execute(text(sql))
+        seq = result.fetchall()
+        return seq
+
+def execute_by_sql(sql: str):
+    """
+    执行insert, update, delete等更新sql
+    """
+    with get_db_session() as session:
+        result = session.execute(text(sql))
+        # LOGGER.info(f'sql执行完成, 返回结果: {result}')
+        return result
+
+
+if __name__ == '__main__':
+    sql = """
+    SELECT CODE FROM stocks_sh_main
+UNION
+SELECT CODE FROM stocks_sh_kc
+UNION
+SELECT CODE FROM stocks_sz_main
+UNION
+SELECT CODE FROM stocks_sz_cy
+    """
+    seq = obtain_list_by_sql(sql)
+    for row in seq:
+        print(row[0])
