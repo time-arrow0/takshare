@@ -2,7 +2,6 @@
 Description=Run sync_bfq_daily_etf_price.sh periodically
 
 [Timer]
-# 时区问题：systemd 默认使用 UTC 时间，00:00 UTC 对应北京时间的 08:00
 OnCalendar=*-*-* 18:02:00
 Persistent=true
 
