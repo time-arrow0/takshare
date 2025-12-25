@@ -177,7 +177,7 @@ def tdx_file_data_2_local():
 
 
 
-def data_2_local():
+def web_interface_data_2_local():
     """
     每日收盘后，通过网络接口获取数据，写入数据库
     """
@@ -289,6 +289,6 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # initial_tdx_file_data_2_local()
-    tdx_file_data_2_local()
-    # data_2_local()
+    # tdx_file_data_2_local()
+    web_interface_data_2_local()
     # LOGGER.info('xxx')
