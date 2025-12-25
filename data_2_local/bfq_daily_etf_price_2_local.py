@@ -50,7 +50,7 @@ def get_file_name(code):
 
 def get_file_data(code, greater_date_ts=None):
     file_name = get_file_name(code)
-    file_path = f'D:/new_tdx/T0002/export/bfq-etf-20251219/{file_name}'
+    file_path = f'D:/new_tdx/T0002/export/bfq-etf-20251225/{file_name}'
 
     dtype_dict = {
         'open': 'float64',
@@ -108,10 +108,9 @@ def initial_tdx_file_data_2_local():
         with open(file='data/bfq_daily_etf_price/complete_codes.txt', mode='a', encoding='utf-8') as f:
             f.write(f'{code}\n')
 
-def tdx_file_data_2_local():
+def tdx_file_data_2_local(tdx_file_dir):
     # 逐个读取目标目录文件，查表中该代码最大日期，把大于最大日期的数据写入数据库
-    directory = 'D:/new_tdx/T0002/export/bfq-etf-20251219'
-    items = os.listdir(directory)
+    items = os.listdir(tdx_file_dir)
     dtype_dict = {
         'open': 'float64',
         'close': 'float64',
@@ -139,7 +138,7 @@ def tdx_file_data_2_local():
         if code in complete_code_set:
             continue
         try:
-            file_path = os.path.join(directory, item)
+            file_path = os.path.join(tdx_file_dir, item)
             df = pd.read_csv(file_path,
                          sep='\s+',
                          skiprows=skiprows,
@@ -168,7 +167,7 @@ def tdx_file_data_2_local():
 
 
 
-def data_2_local():
+def daily_data_2_local():
     """
     每日收盘后，通过网络接口获取数据，写入数据库
     """
@@ -179,12 +178,6 @@ def data_2_local():
         LOGGER.info(f'{current_date}不是工作日, 不操作')
         return
 
-    # 进一步检查，判断指数是否有数据，指数有数据才运行
-    index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
-    if index_df.shape[0] == 0:
-        LOGGER.info(f'{current_date}指数无数据, 不操作')
-        return
-
     # 如果表中今日已有数据，不再运行
     # 查询表中数据最大日期
     max_date = get_price_max_date(table_name)
@@ -192,6 +185,12 @@ def data_2_local():
     # 如果最大日期等于当日日期，跳过。（后面如果有需求，可以先查出表中当日数据，再把接口获取的数据去除掉已存在的，再插入表中）
     if date_str == max_date_str:
         LOGGER.info(f'{current_date}已有数据, 不操作')
+        return
+
+    # 进一步检查，判断指数是否有数据，指数有数据才运行
+    index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
+    if index_df.shape[0] == 0:
+        LOGGER.info(f'{current_date}指数无数据, 不操作')
         return
 
     # 定义中文到英文的列名映射
@@ -289,7 +288,7 @@ if __name__ == '__main__':
     pd.set_option('display.width', 1000)  # 设置列宽
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
-    initial_tdx_file_data_2_local()
-    # tdx_file_data_2_local()
-    # data_2_local()
+    # initial_tdx_file_data_2_local()
+    # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20251225')
+    daily_data_2_local()
     # LOGGER.info('xxx')
