@@ -1,0 +1,103 @@
+import pandas as pd
+
+from dao.dao import execute_by_sql
+from data_2_local.common_data_2_local import df_append_2_local
+
+
+def data_2_local():
+    file_path = f'../t/hangqing.txt'
+    # 定义列名。turnover: 成交额
+
+    column_mapping = {
+        '序号': 'serial_no',
+        '代码': 'code',
+        '名称': 'name',
+        '最新价': 'latest_price',
+        '涨跌幅': 'change_pct',
+        '涨跌额': 'change_amount',
+        '成交量': 'volume',
+        '成交额': 'turnover',
+        '振幅': 'amplitude',
+        '最高': 'high',
+        '最低': 'low',
+        '今开': 'open',
+        '昨收': 'pre_close',
+        '量比': 'volume_ratio',
+        '换手率': 'turnover_rate',
+        '市盈率-动态': 'pe_ratio',
+        '市净率': 'pb_ratio',
+        '总市值': 'total_market_cap',
+        '流通市值': 'circulating_market_cap',
+        '涨速': 'change_speed',
+        '5分钟涨跌': 'change_5min',
+        '60日涨跌幅': 'change_60d',
+        '年初至今涨跌幅': 'change_ytd'
+    }
+    column_names = ['serial_no', 'code', 'name', 'latest_price', 'change_pct', 'change_amount', 'volume', 'turnover', 'amplitude', 'high', 'low', 'open', 'pre_close', 'volume_ratio', 'turnover_rate', 'pe_ratio', 'pb_ratio', 'total_market_cap', 'circulating_market_cap', 'change_speed', 'change_5min', 'change_60d', 'change_ytd']
+    dtype_dict = {
+        'code': str
+    }
+    df = pd.read_csv(file_path,
+                     sep=',',
+                     skiprows=1,
+                     # comment='#',  # 跳过以#开头的行
+                     skip_blank_lines=True,  # 跳过空行
+                     dtype=dtype_dict,
+                     names=column_names,
+                     encoding='utf-8')
+    df.rename(columns=column_mapping, inplace=True)
+    print(df.shape[0])
+    series = df['code']
+    # stocks_sh_main_df = df[(df['code'].str.startswith('6'))]
+    # print(type(series))
+    sh_main_codes = []
+    sh_kc_codes = []
+    sz_main_codes = []
+    sz_cy_codes = []
+    prefix_set = set()
+    for code in series:
+        prefix = code[:2]
+        prefix_set.add(prefix)
+        if prefix == '60':
+            sh_main_codes.append(code)
+        elif prefix == '68':
+            sh_kc_codes.append(code)
+        elif prefix == '00':
+            sz_main_codes.append(code)
+        elif prefix == '30':
+            sz_cy_codes.append(code)
+
+    prefixes = list(prefix_set)
+    prefixes.sort(key=lambda x: x)
+    print(prefixes)
+
+    sh_main_sql = get_insert_sql('stocks_sh_main', sh_main_codes)
+    sh_kc_sql = get_insert_sql('stocks_sh_kc', sh_kc_codes)
+    sz_main_sql = get_insert_sql('stocks_sz_main', sz_main_codes)
+    sz_cy_sql = get_insert_sql('stocks_sz_cy', sz_cy_codes)
+    if sh_main_sql:
+        execute_by_sql(sh_main_sql)
+    if sh_kc_sql:
+        execute_by_sql(sh_kc_sql)
+    if sz_main_sql:
+        execute_by_sql(sz_main_sql)
+    if sz_cy_sql:
+        execute_by_sql(sz_cy_sql)
+
+def get_insert_sql(table_name, codes):
+    if len(codes) == 0:
+        return None
+    sql = f"""
+        INSERT INTO {table_name} (code) VALUES 
+    """
+    values_str = "('" + "'),('".join(codes) + "');"
+    sql = sql + values_str
+    return sql
+
+if __name__ == '__main__':
+    data_2_local()
+    # t_table_name = 'tt'
+    # tcodes = ['001', '002']
+    # tsql = get_insert_sql(t_table_name, tcodes)
+    # print(tsql)
+
