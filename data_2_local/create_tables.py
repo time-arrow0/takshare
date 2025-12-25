@@ -668,6 +668,7 @@ def create_dividend():
                 CREATE TABLE {table_name}(
                     `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
                     `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+                    `report_period` DATE    COMMENT '报告期' ,
                     `equity_record_date` DATE    COMMENT '股权登记日' ,
                     `ex_dividend_date` DATE    COMMENT '除权除息日' ,
                     `share_giving_count` DECIMAL(10, 6)    COMMENT '送股数-10送x股' ,
@@ -678,10 +679,10 @@ def create_dividend():
                 )  COMMENT = '分红数据, 只记录除权除息日的分红情况';
                 """
         idx_0_sql = f"""
-                CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, ex_dividend_date);
+                CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, report_period);
                 """
         idx_1_sql = f"""
-            CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(ex_dividend_date);
+            CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(report_period);
             """
         with engine.begin() as connection:
             connection.execute(text(create_sql))
@@ -959,12 +960,12 @@ if __name__ == '__main__':
     # create_stock_listing_date_table()
     # create_bfq_daily_etf_price_table()
 
-    # create_dividend()
+    create_dividend()
     # create_stock_fhps_detail_em()
     # create_stock_fhps_detail_ths()
     # create_delisted_middle_small()
 
-    create_stocks_sh_main()
-    create_stocks_sh_kc()
-    create_stocks_sz_main()
-    create_stocks_sz_cy()
+    # create_stocks_sh_main()
+    # create_stocks_sh_kc()
+    # create_stocks_sz_main()
+    # create_stocks_sz_cy()
