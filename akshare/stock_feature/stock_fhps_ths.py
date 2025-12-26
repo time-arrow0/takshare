@@ -30,30 +30,35 @@ def stock_fhps_detail_ths(symbol: str = "603444") -> pd.DataFrame:
     r = requests.get(url, headers=headers)
     r.encoding = "gbk"
     temp_df = pd.read_html(StringIO(r.text))[0]
-    temp_df["董事会日期"] = pd.to_datetime(
-        temp_df["董事会日期"], format="%Y-%m-%d", errors="coerce"
-    ).dt.date
-    temp_df["股东大会预案公告日期"] = pd.to_datetime(
-        temp_df["股东大会预案公告日期"], format="%Y-%m-%d", errors="coerce"
-    ).dt.date
-    temp_df["实施公告日"] = pd.to_datetime(
-        temp_df["实施公告日"], format="%Y-%m-%d", errors="coerce"
-    ).dt.date
-    if "A股股权登记日" in temp_df.columns:
+    column_set = set(temp_df.columns)
+    if "董事会日期" in column_set:
+        temp_df["董事会日期"] = pd.to_datetime(
+            temp_df["董事会日期"], format="%Y-%m-%d", errors="coerce"
+        ).dt.date
+    if "股东大会预案公告日期" in column_set:
+        temp_df["股东大会预案公告日期"] = pd.to_datetime(
+            temp_df["股东大会预案公告日期"], format="%Y-%m-%d", errors="coerce"
+        ).dt.date
+    if "实施公告日" in column_set:
+        temp_df["实施公告日"] = pd.to_datetime(
+            temp_df["实施公告日"], format="%Y-%m-%d", errors="coerce"
+        ).dt.date
+    if "A股股权登记日" in column_set:
         temp_df["A股股权登记日"] = pd.to_datetime(
             temp_df["A股股权登记日"], format="%Y-%m-%d", errors="coerce"
         ).dt.date
         temp_df["A股除权除息日"] = pd.to_datetime(
             temp_df["A股除权除息日"], format="%Y-%m-%d", errors="coerce"
         ).dt.date
-    else:
+    elif "B股股权登记日" in column_set:
         temp_df["B股股权登记日"] = pd.to_datetime(
             temp_df["B股股权登记日"], format="%Y-%m-%d", errors="coerce"
         ).dt.date
         temp_df["B股除权除息日"] = pd.to_datetime(
             temp_df["B股除权除息日"], format="%Y-%m-%d", errors="coerce"
         ).dt.date
-    temp_df.sort_values(by=["董事会日期"], ignore_index=True, inplace=True)
+    if "董事会日期" in column_set:
+        temp_df.sort_values(by=["董事会日期"], ignore_index=True, inplace=True)
     return temp_df
 
 
