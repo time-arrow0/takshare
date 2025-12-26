@@ -1,17 +1,13 @@
 import os
 import re
 import sys
-import time
 from datetime import datetime, date
 
 import pandas as pd
 
-from dao.dao import obtain_df_by_sql, obtain_list_by_sql
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import akshare as ak
-from data_2_local.common_data_2_local import df_append_2_local, obtain_code_max_date_timestamps, \
-    obtain_middle_small_delisted_stock_code_set
+from dao.dao import obtain_df_by_sql
+from data_2_local.common_data_2_local import df_append_2_local
 from utils.log_utils import setup_logger_simple_msg
 
 TABLE_NAME = 'dividend'
