@@ -89,6 +89,29 @@
 
 ## 更新说明详情
 
+1.18.3 fix: fix stock_ipo_tutor_em interface
+
+	1. 修复 stock_ipo_tutor_em 接口
+	2. 修复 stock_ipo_review_em 接口
+	3. 修复 stock_register_all_em 接口
+
+1.18.2 fix: fix stock_ipo_declare_em interface
+
+	1. 修复 stock_ipo_declare_em 接口
+
+1.18.1 fix: fix stock_us_valuation_baidu interface
+
+	1. 修复 stock_us_valuation_baidu 接口
+
+1.17.99 fix: fix stock_news_em interface
+
+	1. 修复 stock_news_em 接口
+
+1.17.98 fix: fix stock_jgdy_tj_em interface
+
+	1. 修复 stock_jgdy_tj_em 接口
+	2. 修复 fund_fee_em 接口
+
 1.17.97 fix: fix stock_financial_debt_new_ths interface
 
 	1. 修复 stock_financial_abstract_new_ths 接口
@@ -6011,6 +6034,16 @@
     3. 修改 air_quality_hist 接口的请求日期格式，从 '2022-01-01' 为 '20220101'
 
 ## 版本更新说明
+
+1.18.3 fix: fix stock_ipo_tutor_em interface
+
+1.18.2 fix: fix stock_ipo_declare_em interface
+
+1.18.1 fix: fix stock_us_valuation_baidu interface
+
+1.17.99 fix: fix stock_news_em interface
+
+1.17.98 fix: fix stock_jgdy_tj_em interface
 
 1.17.97 fix: fix stock_financial_debt_new_ths interface
 
