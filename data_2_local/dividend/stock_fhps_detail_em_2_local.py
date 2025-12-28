@@ -1,15 +1,14 @@
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import time
 from datetime import datetime, date
 
 import pandas as pd
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dao.dao import obtain_df_by_sql, obtain_list_by_sql
 import akshare as ak
-from data_2_local.common_data_2_local import df_append_2_local, obtain_code_max_date_timestamps, \
-    obtain_middle_small_delisted_stock_code_set
+from data_2_local.common_data_2_local import df_append_2_local, obtain_middle_small_delisted_stock_code_set
 from utils.log_utils import setup_logger_simple_msg
 
 TABLE_NAME = 'stock_fhps_detail_em'

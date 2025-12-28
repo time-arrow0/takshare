@@ -1,15 +1,14 @@
 import os
 import sys
 
+# 项目根目录添加到系统路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import logging
-import traceback
 from contextlib import contextmanager
 from typing import List, Union
 
 import pandas as pd
 from sqlalchemy import create_engine, MetaData, text, insert, Table
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from utils.db_utils import get_db_url
