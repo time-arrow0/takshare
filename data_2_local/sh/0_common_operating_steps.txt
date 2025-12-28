@@ -1,3 +1,13 @@
+0. create "xxx.sh", "xxx.service", "xxx.timer", push
+1. create link file for "xxx.service", "xxx.timer"
+sudo ln -s source_file target_link_file
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sh/sync_bfq_daily_stock_price_sz_main.service /etc/systemd/system/sync_bfq_daily_stock_price_sz_main.service
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sh/sync_bfq_daily_stock_price_sz_main.timer /etc/systemd/system/sync_bfq_daily_stock_price_sz_main.timer
+2. sudo systemctl daemon-reload
+3. sudo systemctl start sync_bfq_daily_stock_price_sz_main.timer
+4. sudo systemctl enable sync_bfq_daily_stock_price_sz_main.timer
+
+# deprecated
 1. write sh
 2. write service
 sudo vim /etc/systemd/system/sync_bfq_daily_stock_price_sz_main.service
@@ -5,5 +15,5 @@ sudo vim /etc/systemd/system/sync_bfq_daily_stock_price_sz_main.service
 sudo vim /etc/systemd/system/sync_bfq_daily_stock_price_sz_main.timer
 4. start timer
 sudo systemctl daemon-reload
-sudo systemctl enable sync_bfq_daily_stock_price_sz_main.timer
 sudo systemctl start sync_bfq_daily_stock_price_sz_main.timer
+sudo systemctl enable sync_bfq_daily_stock_price_sz_main.timer
