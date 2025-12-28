@@ -1,11 +1,11 @@
 import os
 import re
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from datetime import datetime, date
 
 import pandas as pd
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dao.dao import obtain_df_by_sql
 from data_2_local.common_data_2_local import df_append_2_local
 from utils.log_utils import setup_logger_simple_msg
