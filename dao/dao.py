@@ -1,11 +1,14 @@
-# 数据库连接配置
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import logging
 import traceback
 from contextlib import contextmanager
-from typing import List
+from typing import List, Union
 
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, text
+from sqlalchemy import create_engine, MetaData, text, insert, Table
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
@@ -90,9 +93,89 @@ def execute_by_sql(sql: str):
         # LOGGER.info(f'sql执行完成, 返回结果: {result}')
         return result
 
+def insert_batch_single_column(table_name, column, data, batch_size=10000):
+    with get_db_session() as session:
+        total_inserted = 0
+        # 分批插入
+        # range(start, stop, step): 生成从 start 到 stop-1，步长为 step 的整数序列
+        for i in range(0, len(data), batch_size):
+            batch_data = data[i:i + batch_size]
+            # 构建插入语句
+            insert_stmt = text(f"INSERT INTO {table_name} ({column}) VALUES (:value)")
+            # 准备参数
+            params = [{"value": value} for value in batch_data]
+            # 执行批量插入
+            session.execute(insert_stmt, params)
+            batch_inserted = len(batch_data)
+            total_inserted += batch_inserted
+            LOGGER.info(f"已插入 {batch_inserted} 条记录，累计 {total_inserted} 条")
+        LOGGER.info(f"批量插入完成，总计插入 {total_inserted} 条记录")
+        return total_inserted
+
+
+def insert_batch(table_name: str, columns: List[str], data: List[Union[tuple, list, dict]], batch_size: int = 10000) -> int:
+    """
+    使用SQLAlchemy Core的insert表达式进行批量插入
+    """
+    # 反射表结构
+    try:
+        table = Table(table_name, metadata, autoload_with=engine)
+    except Exception as e:
+        logging.error(f"无法反射表结构: {e}")
+        raise
+    # 转换数据为字典列表
+    dict_list = []
+    for i, item in enumerate(data):
+        if isinstance(item, dict):
+            row_dict = {col: item.get(col) for col in columns}
+        elif isinstance(item, (tuple, list)):
+            row_dict = dict(zip(columns, item))
+        else:
+            raise ValueError(f"不支持的数据类型: {type(item)}")
+        dict_list.append(row_dict)
+    total_inserted = 0
+    # 分批插入
+    for i in range(0, len(dict_list), batch_size):
+        batch = dict_list[i:i + batch_size]
+        # 使用insert表达式
+        stmt = insert(table).values(batch)
+        with get_db_session() as session:
+            result = session.execute(stmt)
+        batch_count = len(batch)
+        total_inserted += batch_count
+        LOGGER.info(f"批次 {i // batch_size + 1}: 插入 {batch_count} 条记录")
+    LOGGER.info(f"批量插入完成，总计插入 {total_inserted} 条记录")
+    return total_inserted
+
+def df_append_2_local(table_name, df, table_column_set=None):
+    """
+    如果传了table_column_set，不在table_column_set中的列会被删掉，避免插入报错
+    """
+    if table_column_set:
+        columns = df.columns
+        for column in columns:
+            if column not in table_column_set:
+                df.drop(column, axis=1, inplace=True)
+        if len(df.columns) == 0:
+            LOGGER.info('df没有和表中相同的列')
+            return None
+    with get_db_session() as session:
+        # 使用session的connection
+        df.to_sql(
+            name=table_name,
+            con=session.connection(),
+            if_exists='append',
+            index=False,
+            method='multi',
+            chunksize=10000
+        )
+        # 不需要显式commit，上下文管理器会自动处理
+        print(f"{table_name} 成功插入 {len(df)} 条数据")
+        return True
+
 
 if __name__ == '__main__':
-    sql = """
+    tsql = """
     SELECT CODE FROM stocks_sh_main
 UNION
 SELECT CODE FROM stocks_sh_kc
@@ -101,6 +184,6 @@ SELECT CODE FROM stocks_sz_main
 UNION
 SELECT CODE FROM stocks_sz_cy
     """
-    seq = obtain_list_by_sql(sql)
-    for row in seq:
-        print(row[0])
+    tseq = obtain_list_by_sql(tsql)
+    for trow in tseq:
+        print(trow[0])
