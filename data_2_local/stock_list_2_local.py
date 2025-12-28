@@ -1,7 +1,9 @@
+import os
+
 import pandas as pd
 
-from dao.dao import execute_by_sql
-from data_2_local.common_data_2_local import df_append_2_local
+from dao.dao import execute_by_sql, insert_batch_single_column
+from data_2_local.common_data_obtain import obtain_stock_codes_a
 
 
 def data_2_local():
@@ -84,6 +86,24 @@ def data_2_local():
     if sz_cy_sql:
         execute_by_sql(sz_cy_sql)
 
+def deleted_2_local():
+    """
+    已退市的，不包括京市
+    """
+    directory = 'D:/new_tdx/T0002/export/bfq_delisted'
+    items = os.listdir(directory)
+    codes = []
+    for item in items:
+        code = item[9:15]
+        if code[0] == '9' or code[0] == '2':
+            continue
+        codes.append(code)
+    # print(len(codes))
+    # print(codes)
+    table_name = 'stocks_delisted'
+    insert_batch_single_column(table_name=table_name, column='code', data=codes)
+
+
 def get_insert_sql(table_name, codes):
     if len(codes) == 0:
         return None
@@ -94,10 +114,31 @@ def get_insert_sql(table_name, codes):
     sql = sql + values_str
     return sql
 
+def obtain_big_quant_codes():
+    with open(file='data/stock_list_2_local/big_quant_codes.txt', mode='r', encoding='utf-8') as f:
+        content = f.read()
+        codes0 = content.split('\n')
+    codes = []
+    for code in codes0:
+        codes.append(code[:6])
+    return codes
+
+def compare_codes():
+    big_quant_codes = obtain_big_quant_codes()
+    big_quant_code_set = set(big_quant_codes)
+    db_codes = obtain_stock_codes_a()
+    db_code_set = set(db_codes)
+    # db有但big_quant没有的
+    print(db_code_set - big_quant_code_set)
+    # big_quant有但db没有的
+    print(big_quant_code_set - db_code_set)
+
 if __name__ == '__main__':
-    data_2_local()
+    # data_2_local()
     # t_table_name = 'tt'
     # tcodes = ['001', '002']
     # tsql = get_insert_sql(t_table_name, tcodes)
     # print(tsql)
 
+    # compare_codes()
+    deleted_2_local()
