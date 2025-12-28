@@ -1,6 +1,7 @@
 [Unit]
 Description=Run sync_dividend.sh 10 seconds after sync_stock_fhps_detail_em succeeds
 After=sync_stock_fhps_detail_em.service
+Requires=sync_stock_fhps_detail_em.service
 
 [Timer]
 # 每周五18:01
