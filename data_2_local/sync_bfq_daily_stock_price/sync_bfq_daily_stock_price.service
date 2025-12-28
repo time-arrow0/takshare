@@ -1,0 +1,10 @@
+[Unit]
+Description=sync_bfq_daily_stock_price sync service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sh/sync_bfq_daily_stock_price/sync_bfq_daily_stock_price.sh
+User=arrow
+
+[Install]
+WantedBy=multi-user.target
