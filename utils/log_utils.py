@@ -102,7 +102,7 @@ def setup_logger_simple_msg(name='t_app', level=logging.INFO):
 
     # 日志格式
     formatter = logging.Formatter(
-        '%(asctime)s-%(name)s-%(message)s'
+        '%(asctime)s-%(name)s %(message)s'
     )
 
     # 控制台处理器
