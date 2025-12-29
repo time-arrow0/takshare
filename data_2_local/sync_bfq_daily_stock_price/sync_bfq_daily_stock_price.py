@@ -2,18 +2,15 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from utils.web_interface_obtain_data import akshare_em_obtain_daily, baostock_obtain_daily
+from utils.web_interface_obtain_data import baostock_obtain_daily
+from data_2_local.sync_stock_name_change.sync_stock_name_change import sync_name_change
 import time
-from datetime import datetime, date
+from datetime import datetime
 
 import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from dao.dao import obtain_list_by_sql, df_append_2_local
 import akshare as ak
-from data_2_local.common_data_2_local import get_price_last_date, get_price_max_date
-from utils.db_utils import get_db_url
 from utils.holiday_utils import ChinaHolidayChecker
 from utils.log_utils import setup_logger_simple_msg
 
@@ -323,6 +320,8 @@ def web_interface_data_2_local():
         table_name = market_table_dict[market]
         df_append_2_local(table_name=table_name, df=df0)
         LOGGER.info(f'{current_date}, {market}同步数据完成, 数据条数: {df0.shape[0]}')
+    # 更新名称变化数据
+    sync_name_change(date_str, df[['code', 'name']])
 
 if __name__ == '__main__':
     # sync_delisted()
