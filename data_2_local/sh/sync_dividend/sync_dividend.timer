@@ -1,13 +1,9 @@
 [Unit]
-Description=Run sync_dividend.sh 10 seconds after sync_stock_fhps_detail_em succeeds
-After=sync_stock_fhps_detail_em.service
-Requires=sync_stock_fhps_detail_em.service
+Description=Run sync_dividend.sh periodically
 
 [Timer]
-# 每周五18:01
-# OnCalendar=Fri 18:01:00
-OnActiveSec=10
-Unit=sync_dividend.service
+# 每周五18:02
+OnCalendar=Fri 18:02:00
 Persistent=true
 
 [Install]

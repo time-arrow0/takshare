@@ -1,7 +1,5 @@
 [Unit]
 Description=sync_dividend service
-After=sync_stock_fhps_detail_em.service
-Requires=sync_stock_fhps_detail_em.service
 
 [Service]
 Type=oneshot
