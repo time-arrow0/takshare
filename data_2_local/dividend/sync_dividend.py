@@ -68,6 +68,7 @@ def extract_dividend_info(description):
     return share_giving, share_conversion, cash_dividend
 
 
+
 def sync_dividend_all():
     """
     同步所有数据
@@ -159,13 +160,33 @@ def sync_dividend_all():
     df_append_2_local(table_name=TABLE_NAME, df=df)
 
 
-def sync_dividend():
+def get_em_update_status():
+    """
+    获取东财接口更新情况，更新日期、更新状态，用以判断是否执行sync_dividend
+    """
+    with open(file='data/stock_fhps_detail_em_2_local/status.txt', mode='r', encoding='utf-8') as f:
+        content = f.read()
+        values = content.split('-')
+        em_date_str = values[0]
+        em_status = values[1]
+        return em_date_str, em_status
+
+def weekly_sync_dividend():
     """
     只同步报告期为去年12月31日和今年6月30日的数据
     在东财数据同步任务运行完成后运行，目前和东财数据同步任务运行频率一样，每周运行一次
     """
     # 要考虑去年12月31日报告和今年6月30日报告
     current_time = datetime.now()
+    current_date_str = current_time.strftime('%Y%m%d')
+    # 获取东财接口更新情况
+    em_date_str, em_status = get_em_update_status()
+    if current_date_str != em_date_str:
+        LOGGER.info(f'当前日期{current_date_str}不等于东财接口最新更新日期{em_date_str}, 不运行')
+        return
+    if em_status != '1':
+        LOGGER.info(f'东财接口未更新数据(状态为{em_status}), 不运行')
+        return
     year = current_time.year
     last_year = date(year - 1, 12, 31)
     mid_year = date(year, 6, 30)
@@ -212,4 +233,4 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # sync_dividend_all()
-    sync_dividend()
+    weekly_sync_dividend()

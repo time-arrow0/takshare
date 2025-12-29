@@ -167,6 +167,7 @@ def weekly_adjust_factor_2_local():
     """
     # 要考虑去年12月31日报告和今年6月30日报告
     current_time = datetime.now()
+    current_date_str = current_time.strftime('%Y%m%d')
     year = current_time.year
     last_year = date(year - 1, 12, 31)
     mid_year = date(year, 6, 30)
@@ -270,9 +271,20 @@ def weekly_adjust_factor_2_local():
         table_column_set = {'code', 'report_period', 'performance_disclosure_date', 'total_bonus_ratio', 'bonus_ratio', 'conversion_ratio', 'cash_dividend_ratio', 'cash_dividend_description', 'dividend_yield', 'eps', 'navps', 'surplus_reserve_per_share', 'retained_earnings_per_share', 'net_profit_yoy_growth', 'total_shares', 'plan_announcement_date', 'equity_record_date', 'ex_dividend_date', 'plan_progress', 'latest_announcement_date'}
         df_append_2_local(TABLE_NAME, df, table_column_set)
         LOGGER.info(f'新增数量: {df.shape[0]}')
+        # 更新状态文件，后续sync_dividend是否运行要依赖它
+        write_update_status(date_str=current_date_str, status='1')
     else:
         LOGGER.info(f'没有要新增的数据')
+        write_update_status(date_str=current_date_str, status='0')
 
+
+def write_update_status(date_str, status):
+    """
+    date_str: yyyyMMdd
+    status: '1'代表更新，'0'代表未更新
+    """
+    with open(file='data/stock_fhps_detail_em_2_local/status.txt', mode='w', encoding='utf-8') as f:
+        f.write(f'{date_str}-{status}')
 
 
 if __name__ == '__main__':
@@ -283,3 +295,4 @@ if __name__ == '__main__':
 
     # initial_stock_fhps_detail_em_2_local()
     weekly_adjust_factor_2_local()
+    # write_update_status(date_str='20251229', status='0')
