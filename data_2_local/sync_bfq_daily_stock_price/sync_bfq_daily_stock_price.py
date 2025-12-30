@@ -421,7 +421,7 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    t_dir = 'D:/new_tdx/T0002/export/bfq-sh-sz-20251229'
+    # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-sz-20251229'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251229'
-    tdx_file_single_date_data_2_local(t_dir, '20251229')
-    # web_interface_data_2_local()
+    # tdx_file_single_date_data_2_local(t_dir, '20251229')
+    web_interface_data_2_local()
