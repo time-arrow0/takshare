@@ -140,6 +140,97 @@ def tdx_file_data_2_local(dir0):
             LOGGER.error(s)
             raise e
 
+def tdx_file_single_date_data_2_local(dir0, date_str):
+    """
+    同步指定日期的数据
+    """
+    # existed_code_date_set = obtain_existed_code_date_set()
+
+    date = datetime.strptime(date_str, '%Y%m%d')
+    # 逐个读取目标目录文件，查表中该代码最大日期，把大于最大日期的数据写入数据库
+    items = os.listdir(dir0)
+    dtype_dict = {
+        'open': 'float64',
+        'close': 'float64',
+        'high': 'float64',
+        'low': 'float64',
+        # 'volume': 'int64',
+    }
+    skiprows = 2
+    # turnover: 成交额
+    column_names = ['date', 'open', 'high', 'low', 'close', 'volume', 'turnover']
+    # 代码在文件名中的截取范围
+    code_start = 7
+    code_end = 13  # 不包含
+    # 已完成的代码
+    complete_codes = obtain_complete_code_set('data/tdx_single_date_complete_codes.txt')
+    complete_code_set = set(complete_codes)
+    sh_main_dfs = []
+    sh_kc_dfs = []
+    sz_main_dfs = []
+    sz_cy_dfs = []
+    ts = pd.Timestamp(year=date.year, month=date.month, day=date.day)
+    for item in items:
+        code = item[code_start: code_end]
+        if code in complete_code_set:
+            continue
+        try:
+            file_path = os.path.join(dir0, item)
+            df = pd.read_csv(file_path,
+                         sep='\s+',
+                         skiprows=skiprows,
+                         comment='#',  # 跳过以#开头的行
+                         skip_blank_lines=True,  # 跳过空行
+                         names=column_names,
+                         dtype=dtype_dict,
+                         encoding='GBK')
+            df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
+            df['code'] = code
+            df['date'] = pd.to_datetime(df['date'])
+            df = df[df['date'] == ts]
+            # df['union_key'] = df['code'] + '-' + pd.to_datetime(df['date']).dt.strftime('%Y%m%d')
+            # df = df[~df['union_key'].isin(existed_code_date_set)]
+            # df.drop(labels=['union_key'], axis=1, inplace=True)
+            if df.shape[0] == 0:
+                continue
+            prefix = code[:2]
+            if prefix == '60':
+                sh_main_dfs.append(df)
+            elif prefix == '68':
+                sh_kc_dfs.append(df)
+            elif prefix == '00':
+                sz_main_dfs.append(df)
+            elif prefix == '30':
+                sz_cy_dfs.append(df)
+            else:
+                LOGGER.info(f'{code}, 未找到符合前缀{prefix}的表')
+                continue
+            append_2_complete_codes_file(code=code, file_path='data/tdx_single_date_complete_codes.txt')
+        except Exception as e:
+            s = f'{code}保存出错'
+            LOGGER.error(s)
+            raise e
+    if len(sh_main_dfs) > 0:
+        table_name = 'bfq_daily_stock_price_sh_main'
+        sh_main_df = pd.concat(sh_main_dfs, ignore_index=True)
+        df_append_2_local(table_name=table_name, df=sh_main_df)
+        LOGGER.info('sh_main同步完成')
+    if len(sh_kc_dfs) > 0:
+        table_name = 'bfq_daily_stock_price_sh_kc'
+        sh_kc_df = pd.concat(sh_kc_dfs, ignore_index=True)
+        df_append_2_local(table_name=table_name, df=sh_kc_df)
+        LOGGER.info('sh_kc同步完成')
+    if len(sz_main_dfs) > 0:
+        table_name = 'bfq_daily_stock_price_sz_main'
+        sz_main_df = pd.concat(sz_main_dfs, ignore_index=True)
+        df_append_2_local(table_name=table_name, df=sz_main_df)
+        LOGGER.info('sz_main同步完成')
+    if len(sz_cy_dfs) > 0:
+        table_name = 'bfq_daily_stock_price_sz_cy'
+        sz_cy_df = pd.concat(sz_cy_dfs, ignore_index=True)
+        df_append_2_local(table_name=table_name, df=sz_cy_df)
+        LOGGER.info('sz_cy同步完成')
+
 def sync_delisted():
     """
         如果要批量增量更新，需要排除掉已有数据，要修改代码。obtain_existed_code_date_set()数据量过大，不再使用
@@ -187,6 +278,8 @@ def sync_delisted():
         success = df_append_2_local(table_name, df)
         append_2_complete_codes_file(code)
         time.sleep(0.5)
+
+
 
 def web_interface_data_2_local():
     """
@@ -328,4 +421,7 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    web_interface_data_2_local()
+    t_dir = 'D:/new_tdx/T0002/export/bfq-sh-sz-20251229'
+    # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251229'
+    tdx_file_single_date_data_2_local(t_dir, '20251229')
+    # web_interface_data_2_local()
