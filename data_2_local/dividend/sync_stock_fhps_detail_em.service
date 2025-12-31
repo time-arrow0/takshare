@@ -3,6 +3,7 @@ Description=sync_stock_fhps_detail_em service
 
 [Service]
 Type=oneshot
+WorkingDirectory=/home/arrow/code/invest/takshare/data_2_local/dividend
 ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/dividend/sync_stock_fhps_detail_em.sh
 User=arrow
 
