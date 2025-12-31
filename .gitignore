@@ -32,6 +32,3 @@ colors
 *.gif
 
 t/t_chromedriver/chrome_profile
-data_2_local/dividend/data/stock_fhps_detail_em_2_local/status.txt
-data_2_local/sync_stock_industry_change/data/sync_stock_industry_change/sync_objectid.txt
-data_2_local/sync_stock_industry_change/data/sync_stock_industry_change_cninfo_inc/status.txt
