@@ -112,7 +112,7 @@ def insert_batch_single_column(table_name, column, data, batch_size=10000):
         return total_inserted
 
 
-def insert_batch(table_name: str, columns: List[str], data: List[Union[tuple, list, dict]], batch_size: int = 10000) -> int:
+def insert_batch(table_name: str, columns: List[str], rows: List[Union[tuple, list, dict]], batch_size: int = 10000) -> int:
     """
     使用SQLAlchemy Core的insert表达式进行批量插入
     """
@@ -124,7 +124,7 @@ def insert_batch(table_name: str, columns: List[str], data: List[Union[tuple, li
         raise
     # 转换数据为字典列表
     dict_list = []
-    for i, item in enumerate(data):
+    for i, item in enumerate(rows):
         if isinstance(item, dict):
             row_dict = {col: item.get(col) for col in columns}
         elif isinstance(item, (tuple, list)):
