@@ -3,7 +3,7 @@ Description=sync_dividend service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sh/sync_dividend/sync_dividend.sh
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/dividend/sync_dividend.sh
 User=arrow
 
 [Install]
