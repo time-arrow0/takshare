@@ -1,0 +1,10 @@
+[Unit]
+Description=sync_stock_industry_change sync service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change.sh
+User=arrow
+
+[Install]
+WantedBy=multi-user.target

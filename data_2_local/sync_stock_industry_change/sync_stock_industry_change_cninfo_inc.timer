@@ -1,0 +1,9 @@
+[Unit]
+Description=Run sync_stock_industry_change_cninfo_inc.sh periodically
+
+[Timer]
+OnCalendar=Fri 18:03:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
