@@ -170,7 +170,10 @@ def tdx_file_single_date_data_2_local(dir0, date_str):
     sz_main_dfs = []
     sz_cy_dfs = []
     ts = pd.Timestamp(year=date.year, month=date.month, day=date.day)
-    for item in items:
+    n = len(items)
+    for i, item in enumerate(items):
+        if i % 100 == 0:
+            print(f'进度: {i}/{n}')
         code = item[code_start: code_end]
         if code in complete_code_set:
             continue
@@ -420,7 +423,6 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-sz-20251229'
-    # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251229'
-    # tdx_file_single_date_data_2_local(t_dir, '20251229')
+    # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-sz-20251231'
+    # tdx_file_single_date_data_2_local(t_dir, '20251230')
     web_interface_data_2_local()
