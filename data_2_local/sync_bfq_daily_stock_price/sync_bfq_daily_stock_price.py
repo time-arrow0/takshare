@@ -401,7 +401,6 @@ def web_interface_data_2_local():
     # 只取在需同步前缀列表中的数据
     df['prefix'] = df['code'].str[:2]
     df = df[df['prefix'].isin(sync_prefix_set)]
-    df = df[['code', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
     df['date'] = date_str
     df['date'] = pd.to_datetime(df['date'])
     # 这个接口返回的数据成交量单位是"100"，需要乘以100
