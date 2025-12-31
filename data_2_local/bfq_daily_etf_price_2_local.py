@@ -57,7 +57,7 @@ def get_file_data(code, greater_date_ts=None):
         'close': 'float64',
         'high': 'float64',
         'low': 'float64',
-        # 'volume': 'int64',
+        'turnover': 'float64',
     }
     skiprows = 2
     # turnover: 成交额
@@ -71,7 +71,7 @@ def get_file_data(code, greater_date_ts=None):
                      dtype=dtype_dict,
                      encoding='GBK')
     # print(df)
-    df = df[['date', 'open', 'high', 'low', 'close', 'volume']]
+    df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
     df['code'] = code
     df['date'] = pd.to_datetime(df['date'])
     if greater_date_ts is not None:
@@ -116,7 +116,7 @@ def tdx_file_data_2_local(tdx_file_dir):
         'close': 'float64',
         'high': 'float64',
         'low': 'float64',
-        # 'volume': 'int64',
+        'turnover': 'float64',
     }
     skiprows = 2
     # turnover: 成交额
@@ -147,12 +147,12 @@ def tdx_file_data_2_local(tdx_file_dir):
                          names=column_names,
                          dtype=dtype_dict,
                          encoding='GBK')
-            df = df[['date', 'open', 'high', 'low', 'close', 'volume']]
+            df = df[['date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
             df['code'] = code
             df['date'] = pd.to_datetime(df['date'])
             last_date = get_price_last_date(table_name, code)
-            last_date_ts = pd.Timestamp(last_date)
             if last_date is not None:
+                last_date_ts = pd.Timestamp(last_date)
                 df = df[df['date'] > last_date_ts]
             if df.shape[0] > 0:
                 df_append_2_local(table_name=table_name, df=df)
@@ -171,6 +171,7 @@ def daily_data_2_local():
     """
     每日收盘后，通过网络接口获取数据，写入数据库
     """
+    etf_code_set = {'159915', '159941', '159949', '159985', '510150', '510180', '512050', '512100', '512480', '512930', '513090', '513100', '513330', '513500', '518880', '562500', '588000', '588100'}
     current_date = datetime.now().date()
     date_str = current_date.strftime('%Y%m%d')
     # 如果当天不是工作日，不操作
@@ -234,33 +235,45 @@ def daily_data_2_local():
     }
     # 定义数据类型映射
     dtype_dict = {
-        'id': 'int64',
-        'code': 'str',
-        'name': 'str',
         'close': 'float64',
-        'change_rate': 'float64',
-        'change_amount': 'float64',
+        'iopv_real_time': 'float64',
+        'fund_discount_rate': 'float64',
+        'price_change': 'float64',
+        'price_change_pct': 'float64',
         'volume': 'float64',
         'turnover': 'float64',
-        'amplitude': 'float64',
+        'open': 'float64',
         'high': 'float64',
         'low': 'float64',
-        'open': 'float64',
-        'previous_close': 'float64',
-        'volume_ratio': 'float64',
+        'prev_close': 'float64',
         'turnover_rate': 'float64',
-        'pe_ratio': 'float64',
-        'pb_ratio': 'float64',
-        'total_market_cap': 'float64',
-        'float_market_cap': 'float64',
-        'change_speed': 'float64',
-        'change_5min': 'float64',
-        'change_60d': 'float64',
-        'change_ytd': 'float64'
+        'volume_ratio': 'float64',
+        'order_ratio': 'float64',
+        'outside_volume': 'float64',
+        'inside_volume': 'float64',
+        'main_net_inflow_amount': 'float64',
+        'main_net_inflow_ratio': 'float64',
+        'super_large_net_inflow_amount': 'float64',
+        'super_large_net_inflow_ratio': 'float64',
+        'large_net_inflow_amount': 'float64',
+        'large_net_inflow_ratio': 'float64',
+        'medium_net_inflow_amount': 'float64',
+        'medium_net_inflow_ratio': 'float64',
+        'small_net_inflow_amount': 'float64',
+        'small_net_inflow_ratio': 'float64',
+        'current_hand': 'float64',
+        'bid_1': 'float64',
+        'ask_1': 'float64',
+        'latest_share': 'float64',
+        'float_market_cap': 'int64',
+        'total_market_cap': 'int64',
     }
 
     # 查询当日数据
     df = ak.fund_etf_spot_em()
+    if df.shape[0] == 0:
+        LOGGER.info(f'{current_date}未获取到数据, 不操作')
+        return
     df.rename(columns=column_mapping, inplace=True)
     # 去掉值为空的
     df = df[pd.notna(df["open"])]
@@ -269,10 +282,10 @@ def daily_data_2_local():
         return
     # 转换类型
     df = df.astype(dtype_dict)
-    # df['id'] = df['id'].astype('int64')
-    # df['code'] = df['code'].astype('str')
-    # df['name'] = df['name'].astype('str')
-    df = df[['code', 'open', 'high', 'low', 'close', 'volume']]
+    df['code'] = df['code'].astype('str')
+    # 只保留在etf列表中的
+    df = df[df['code'].isin(etf_code_set)]
+    df = df[['code', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
     df['date'] = date_str
     df['date'] = pd.to_datetime(df['date'])
     # 这个接口返回的数据成交量单位是"100"，需要乘以100
@@ -289,6 +302,6 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # initial_tdx_file_data_2_local()
-    # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20251225')
+    # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20251231')
     daily_data_2_local()
     # LOGGER.info('xxx')
