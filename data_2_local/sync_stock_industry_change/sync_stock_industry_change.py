@@ -115,13 +115,26 @@ def sync_stock_industry_change():
     """
     在sync_stock_industry_change_cninfo_inc运行完成后，根据它是否更新了运行
     """
+    with open(file='data/sync_stock_industry_change_cninfo_inc/status.txt', mode='r', encoding='UTF-8') as f:
+        content = f.read()
+    if not content:
+        LOGGER.info('sync_stock_industry_change_cninfo_inc状态文件为空, 需要它同步过后再同步行业变化数据')
+        return
+    date_str, updated = content.split('-')
+    current_date_str = datetime.now().strftime('%Y%m%d')
+    if date_str != current_date_str:
+        LOGGER.info('sync_stock_industry_change_cninfo_inc今日未同步, 需要它同步过后再同步行业变化数据')
+        return
+    if updated == '0':
+        LOGGER.info('sync_stock_industry_change_cninfo_inc今日同步没有新数据, 不需要同步行业变化数据')
+        return
     with open(file='data/sync_stock_industry_change/sync_objectid.txt', mode='r', encoding='UTF-8') as f:
         content = f.read()
     if not content:
         LOGGER.info(f'sync_objectid.txt没有内容, 请先维护初始日期-已更新到的objectid')
         return
     date_str, last_objectid_str = content.split('-')
-    current_date_str = datetime.now().strftime('%Y%m%d')
+
     # 上次更新到的objectid
     last_objectid = int(last_objectid_str)
     # 新的最大objectid

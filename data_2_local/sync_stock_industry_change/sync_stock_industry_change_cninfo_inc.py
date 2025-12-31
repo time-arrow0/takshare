@@ -86,6 +86,11 @@ def sync_stock_industry_change_cninfo_inc():
         time.sleep(0.5)
     if count == 0:
         LOGGER.info(f'未获取到新数据')
+        updated = '0'
+    else:
+        updated = '1'
+    with open(file='data/sync_stock_industry_change_cninfo_inc/status.txt', mode='w', encoding='UTF-8') as f:
+        f.write(f"{datetime.now().strftime('%Y%m%d')}-{updated}")
 
 if __name__ == '__main__':
     # sync_stock_industry_change_cninfo_inc_all()
