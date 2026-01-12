@@ -97,8 +97,7 @@ def sync_name_change(date_str, df):
     if df.shape[0] == 0:
         LOGGER.info(f'{date_str}没有新名称')
         return
-    df['start_date'] = date_str
-    df['start_date'] = pd.to_datetime(df['start_date'])
+    df.loc[:, 'start_date'] = pd.to_datetime(date_str)
     df = df[['code', 'start_date', 'name']]
     df_append_2_local(TABLE_NAME, df)
     LOGGER.info(f'{date_str}同步名称完成')
