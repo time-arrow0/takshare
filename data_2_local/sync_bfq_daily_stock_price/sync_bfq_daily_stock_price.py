@@ -140,7 +140,7 @@ def tdx_file_data_2_local(dir0):
             LOGGER.error(s)
             raise e
 
-def tdx_file_single_date_data_2_local(dir0, date_str):
+def tdx_file_single_date_data_2_local(dir0, date_str, flag_num=15):
     """
     同步指定日期的数据
     """
@@ -213,26 +213,40 @@ def tdx_file_single_date_data_2_local(dir0, date_str):
             s = f'{code}保存出错'
             LOGGER.error(s)
             raise e
-    if len(sh_main_dfs) > 0:
+    # 判断是否插入到表中
+    b_sh_main, b_sh_kc, b_sz_main, b_sz_cy = get_flags_basic(flag_num)
+    if b_sh_main and len(sh_main_dfs) > 0:
         table_name = 'bfq_daily_stock_price_sh_main'
         sh_main_df = pd.concat(sh_main_dfs, ignore_index=True)
         df_append_2_local(table_name=table_name, df=sh_main_df)
         LOGGER.info('sh_main同步完成')
-    if len(sh_kc_dfs) > 0:
+    if b_sh_kc and len(sh_kc_dfs) > 0:
         table_name = 'bfq_daily_stock_price_sh_kc'
         sh_kc_df = pd.concat(sh_kc_dfs, ignore_index=True)
         df_append_2_local(table_name=table_name, df=sh_kc_df)
         LOGGER.info('sh_kc同步完成')
-    if len(sz_main_dfs) > 0:
+    if b_sz_main and len(sz_main_dfs) > 0:
         table_name = 'bfq_daily_stock_price_sz_main'
         sz_main_df = pd.concat(sz_main_dfs, ignore_index=True)
         df_append_2_local(table_name=table_name, df=sz_main_df)
         LOGGER.info('sz_main同步完成')
-    if len(sz_cy_dfs) > 0:
+    if b_sz_cy and len(sz_cy_dfs) > 0:
         table_name = 'bfq_daily_stock_price_sz_cy'
         sz_cy_df = pd.concat(sz_cy_dfs, ignore_index=True)
         df_append_2_local(table_name=table_name, df=sz_cy_df)
         LOGGER.info('sz_cy同步完成')
+
+
+def get_flags_basic(number):
+    """基础位运算方法获取4个标志位"""
+    if not 0 <= number <= 15:
+        raise ValueError("数字必须在0-15范围内")
+    # 分别获取4个标志位（从低位到高位）
+    flag1 = (number >> 0) & 1  # 最低位（第1位）
+    flag2 = (number >> 1) & 1  # 第2位
+    flag3 = (number >> 2) & 1  # 第3位
+    flag4 = (number >> 3) & 1  # 最高位（第4位）
+    return flag4, flag3, flag2, flag1  # 返回高位到低位
 
 def sync_delisted():
     """
@@ -424,5 +438,5 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
     t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
-    tdx_file_single_date_data_2_local(t_dir, '20251231')
+    tdx_file_single_date_data_2_local(t_dir, '20260105')
     # web_interface_data_2_local()
