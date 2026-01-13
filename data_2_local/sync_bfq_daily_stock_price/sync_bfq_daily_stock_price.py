@@ -396,9 +396,10 @@ def web_interface_data_2_local(flag='1111'):
 
     # 查询当日数据
     df = ak.stock_sz_a_spot_em()
+    LOGGER.info(f'{date_str}, df size: {df.shape[0]}')
     df.rename(columns=column_mapping, inplace=True)
     # 去掉值为空的
-    df = df[pd.notna(df["open"])]
+    df = df[pd.notna(df["open"])].copy()
     if df.shape[0] == 0:
         LOGGER.info(f'{current_date}未获取到数据, 不操作')
         return
@@ -410,6 +411,7 @@ def web_interface_data_2_local(flag='1111'):
     df['prefix'] = df['code'].str[:2]
     unique_prefixes = df['prefix'].unique()
     LOGGER.info(f'{date_str}, unique_prefixes: {unique_prefixes}')
+    LOGGER.info(f'{date_str}, df size: {df.shape[0]}')
     df = df[df['prefix'].isin(sync_prefix_set)].copy()
     df['date'] = date_str
     df['date'] = pd.to_datetime(df['date'])
