@@ -108,7 +108,7 @@ def initial_tdx_file_data_2_local():
         with open(file='data/bfq_daily_etf_price/complete_codes.txt', mode='a', encoding='utf-8') as f:
             f.write(f'{code}\n')
 
-def tdx_file_data_2_local(tdx_file_dir):
+def tdx_file_data_2_local(tdx_file_dir, start_date_str=None, end_date_str=None):
     # 逐个读取目标目录文件，查表中该代码最大日期，把大于最大日期的数据写入数据库
     items = os.listdir(tdx_file_dir)
     dtype_dict = {
@@ -153,7 +153,14 @@ def tdx_file_data_2_local(tdx_file_dir):
             last_date = get_price_last_date(table_name, code)
             if last_date is not None:
                 last_date_ts = pd.Timestamp(last_date)
-                df = df[df['date'] > last_date_ts]
+                df = df[df['date'] > last_date_ts].copy()
+                if start_date_str:
+                    start_date_ts = pd.Timestamp(start_date_str)
+                    df = df[df['date'] >= start_date_ts].copy()
+                if end_date_str:
+                    end_date_ts = pd.Timestamp(end_date_str)
+                    df = df[df['date'] <= end_date_ts].copy()
+
             if df.shape[0] > 0:
                 df_append_2_local(table_name=table_name, df=df)
             with open(file='data/bfq_daily_etf_price/complete_codes.txt', mode='a',
@@ -284,7 +291,7 @@ def daily_data_2_local():
     df = df.astype(dtype_dict)
     df['code'] = df['code'].astype('str')
     # 只保留在etf列表中的
-    df = df[df['code'].isin(etf_code_set)]
+    df = df[df['code'].isin(etf_code_set)].copy()
     df = df[['code', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
     df['date'] = date_str
     df['date'] = pd.to_datetime(df['date'])
@@ -302,6 +309,6 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # initial_tdx_file_data_2_local()
-    # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20251231')
+    # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20260113', start_date_str=None, end_date_str='20260112')
     daily_data_2_local()
     # LOGGER.info('xxx')
