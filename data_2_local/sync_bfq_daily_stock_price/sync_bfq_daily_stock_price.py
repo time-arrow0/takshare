@@ -395,7 +395,7 @@ def web_interface_data_2_local(flag='1111'):
     }
 
     # 查询当日数据
-    df = ak.stock_sz_a_spot_em()
+    df = ak.stock_zh_a_spot_em()
     LOGGER.info(f'{date_str}, df size: {df.shape[0]}')
     df.rename(columns=column_mapping, inplace=True)
     # 去掉值为空的
