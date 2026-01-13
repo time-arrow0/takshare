@@ -339,7 +339,7 @@ def web_interface_data_2_local(flag='1111'):
         LOGGER.info(f'{date_str}已有数据, 不操作')
         return
 
-    print(f'sync_prefix_set: {sync_prefix_set}')
+    LOGGER.info(f'{date_str}, sync_prefix_set: {sync_prefix_set}')
     # 定义中文到英文的列名映射
     column_mapping = {
         '序号': 'id',
@@ -408,7 +408,9 @@ def web_interface_data_2_local(flag='1111'):
     df['name'] = df['name'].astype('str')
     # 只取在需同步前缀列表中的数据
     df['prefix'] = df['code'].str[:2]
-    df = df[df['prefix'].isin(sync_prefix_set)]
+    unique_prefixes = df['prefix'].unique()
+    LOGGER.info(f'{date_str}, unique_prefixes: {unique_prefixes}')
+    df = df[df['prefix'].isin(sync_prefix_set)].copy()
     df['date'] = date_str
     df['date'] = pd.to_datetime(df['date'])
     # 这个接口返回的数据成交量单位是"100"，需要乘以100
@@ -423,7 +425,7 @@ def web_interface_data_2_local(flag='1111'):
         table_name = market_table_dict[market]
         df_append_2_local(table_name=table_name, df=df0)
         i += 1
-        LOGGER.info(f'{current_date}, {market}同步数据完成, 数据条数: {df0.shape[0]}')
+        LOGGER.info(f'{date_str}, {market}同步数据完成, 数据条数: {df0.shape[0]}')
     # 更新名称变化数据
     sync_name_change(date_str, df[['code', 'name']])
 
