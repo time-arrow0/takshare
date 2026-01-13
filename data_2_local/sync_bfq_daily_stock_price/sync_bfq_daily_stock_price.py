@@ -325,6 +325,7 @@ def web_interface_data_2_local():
         'sz_main': 'bfq_daily_stock_price_sz_main',
         'sz_cy': 'bfq_daily_stock_price_sz_cy'
     }
+
     # 需要同步的前缀
     sync_prefix_set = set()
     for row in max_date_rows:
@@ -335,8 +336,10 @@ def web_interface_data_2_local():
             sync_prefix_set = sync_prefix_set.union(prefixes)
     # 如果需要同步的前缀为空，跳过。（后面如果有需求，可以先查出表中当日数据，再把接口获取的数据去除掉已存在的，再插入表中）
     if len(sync_prefix_set) == 0:
-        LOGGER.info(f'{current_date}已有数据, 不操作')
+        LOGGER.info(f'{date_str}已有数据, 不操作')
         return
+
+    print(f'sync_prefix_set: {sync_prefix_set}')
     # 定义中文到英文的列名映射
     column_mapping = {
         '序号': 'id',
@@ -425,6 +428,6 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
-    tdx_file_single_date_data_2_local(t_dir, '20260107')
-    # web_interface_data_2_local()
+    # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
+    # tdx_file_single_date_data_2_local(t_dir, '20260107')
+    web_interface_data_2_local()
