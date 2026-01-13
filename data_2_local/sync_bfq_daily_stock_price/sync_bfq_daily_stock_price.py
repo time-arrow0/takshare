@@ -286,7 +286,7 @@ def sync_delisted():
 
 
 
-def web_interface_data_2_local():
+def web_interface_data_2_local(flag='1111'):
     """
     每日收盘后，通过网络接口获取数据，写入数据库
     """
@@ -414,11 +414,15 @@ def web_interface_data_2_local():
     # 这个接口返回的数据成交量单位是"100"，需要乘以100
     df['volume'] = df['volume'] * 100
     # 按前缀拆分为4个市场的df分别处理
+    i = 0
     for market, prefixes in market_prefixes_dict.items():
+        if flag[i] == '0':
+            continue
         df0 = df[df['prefix'].isin(prefixes)]
         df0 = df0[['code', 'date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
         table_name = market_table_dict[market]
         df_append_2_local(table_name=table_name, df=df0)
+        i += 1
         LOGGER.info(f'{current_date}, {market}同步数据完成, 数据条数: {df0.shape[0]}')
     # 更新名称变化数据
     sync_name_change(date_str, df[['code', 'name']])
@@ -430,4 +434,4 @@ if __name__ == '__main__':
     # tdx_file_data_2_local(t_dir)
     # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
     # tdx_file_single_date_data_2_local(t_dir, '20260107')
-    web_interface_data_2_local()
+    web_interface_data_2_local(flag='1100')
