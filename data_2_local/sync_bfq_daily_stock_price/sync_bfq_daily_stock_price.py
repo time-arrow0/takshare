@@ -438,4 +438,4 @@ if __name__ == '__main__':
     # tdx_file_data_2_local(t_dir)
     # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
     # tdx_file_single_date_data_2_local(t_dir, '20260107')
-    web_interface_data_2_local(flag='1100')
+    web_interface_data_2_local()
