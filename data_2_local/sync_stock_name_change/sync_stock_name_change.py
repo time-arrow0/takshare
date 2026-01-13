@@ -93,7 +93,7 @@ def sync_name_change(date_str, df):
     max_date_code_name_dict = obtain_max_date_code_name_dict()
     df['name1'] = df['code'].map(max_date_code_name_dict)
     # 筛选出name1为空，或者不等于name的列
-    df = df[pd.isna(df['name1']) | (df['name'] != df['name1'])]
+    df = df[pd.isna(df['name1']) | (df['name'] != df['name1'])].copy()
     if df.shape[0] == 0:
         LOGGER.info(f'{date_str}没有新名称')
         return
