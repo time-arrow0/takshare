@@ -418,7 +418,7 @@ def web_interface_data_2_local(flag='1111'):
     for market, prefixes in market_prefixes_dict.items():
         if flag[i] == '0':
             continue
-        df0 = df[df['prefix'].isin(prefixes)]
+        df0 = df[df['prefix'].isin(prefixes)].copy()
         df0 = df0[['code', 'date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
         table_name = market_table_dict[market]
         df_append_2_local(table_name=table_name, df=df0)
