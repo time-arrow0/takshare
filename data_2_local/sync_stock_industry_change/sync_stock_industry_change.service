@@ -3,6 +3,7 @@ Description=sync_stock_industry_change sync service
 
 [Service]
 Type=oneshot
+WorkingDirectory=/home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change
 ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change.sh
 User=arrow
 

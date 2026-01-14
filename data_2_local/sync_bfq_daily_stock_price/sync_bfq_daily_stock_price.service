@@ -3,6 +3,7 @@ Description=sync_bfq_daily_stock_price sync service
 
 [Service]
 Type=oneshot
+WorkingDirectory=/home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_stock_price
 ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_stock_price/sync_bfq_daily_stock_price.sh
 User=arrow
 
