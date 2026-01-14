@@ -4,4 +4,4 @@
 VENV_PATH="/home/arrow/code/invest/takshare/.venv"
 
 # 直接使用虚拟环境中的Python解释器
-"$VENV_PATH/bin/python" /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change_cninfo_inc/sync_stock_industry_change_cninfo_inc.py
+"$VENV_PATH/bin/python" /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change_cninfo_inc.py
