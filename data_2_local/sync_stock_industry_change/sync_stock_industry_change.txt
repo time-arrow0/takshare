@@ -1,0 +1,17 @@
+command:
+
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change.service /etc/systemd/system/sync_stock_industry_change.service
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change.timer /etc/systemd/system/sync_stock_industry_change.timer
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart sync_stock_industry_change.service
+sudo systemctl restart sync_stock_industry_change.timer
+
+sudo systemctl enable sync_stock_industry_change.service
+sudo systemctl enable sync_stock_industry_change.timer
+
+sudo systemctl status sync_stock_industry_change.service
+sudo systemctl status sync_stock_industry_change.timer
+
+sudo systemctl list-timers --all --no-pager
