@@ -3,7 +3,7 @@ Description=sync_stock_industry_change_cninfo_inc sync service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change_cninfo_inc/sync_stock_industry_change_cninfo_inc.sh
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_stock_industry_change/sync_stock_industry_change_cninfo_inc.sh
 User=arrow
 
 [Install]
