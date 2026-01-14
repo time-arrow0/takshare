@@ -3,7 +3,7 @@ Description=Run sync_stock_industry_change.sh periodically
 
 [Timer]
 # 比sync_stock_industry_change_cninfo_inc晚1分钟
-OnCalendar=Fri 18:04:00
+OnCalendar=Fri 18:24:00
 Persistent=true
 
 [Install]

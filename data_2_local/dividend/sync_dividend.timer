@@ -2,8 +2,7 @@
 Description=Run sync_dividend.sh periodically
 
 [Timer]
-# 每周五18:02
-OnCalendar=Fri 18:02:00
+OnCalendar=Fri 18:22:00
 Persistent=true
 
 [Install]
