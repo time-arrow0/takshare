@@ -1,10 +1,14 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import time
 
 import pandas as pd
 import akshare as ak
+from dao.dao import obtain_list_by_sql
 
 from data_2_local.common_data_2_local import df_append_2_local
+from data_2_local.common_data_obtain import obtain_stock_codes_a
 from utils.log_utils import setup_logger_simple_msg
 
 LOGGER = setup_logger_simple_msg(name='sync_stock_share_change')
@@ -60,30 +64,18 @@ def init_data_2_local():
         '变动原因编码': 'change_reason_code'
     }
 
-    # with open(file='data/stock_share_change_cninfo_2_local/399101_codes.txt', mode='r', encoding='utf-8') as f:
-    #     content = f.read()
-    #     t_stock_codes = content.split('\n')
-    #     print(len(t_stock_codes))
-    # with open(file='data/stock_share_change_cninfo_2_local/complete_codes.txt', mode='r', encoding='utf-8') as f:
-    #     content = f.read()
-    #     t_complete_codes = content.split('\n')
-    #     print(len(t_complete_codes) - 1)  # 减1是因为多个换行
-    # t_complete_code_set = set(t_complete_codes)
-    # unlisted_set = {'002336', '002750'}  # 退市的查不到数据，跳过
-    # t_codes = []
-    # for code in t_stock_codes:
-    #     if code in t_complete_code_set:
-    #         continue
-    #     if code in unlisted_set:
-    #         continue
-    #     t_codes.append(code)
-    # # t_codes = ['002336']
-    # print(f'len_t_codes: {len(t_codes)}')
+    stock_codes_a = obtain_stock_codes_a()
+    existed_codes = obtain_existed_codes()
+    codes = []
+    for code in stock_codes_a:
+        if code in existed_codes:
+            continue
+        codes.append(code)
 
-    t_codes = ['002334']
     i = 0
-    tlen = len(t_codes)
-    for code in t_codes:
+    tlen = len(codes)
+    print(f"代码数: {tlen}")
+    for code in codes:
         if i % 200 == 0:
             print(f"进度: {i}/{tlen}")
         df = ak.stock_share_change_cninfo(symbol=code, start_date="20000101", end_date="20260114")
@@ -97,7 +89,14 @@ def init_data_2_local():
         #     f.write(f'{code}\n')
         # time.sleep(0.5)
         i += 1
+    print("结束")
 
+def obtain_existed_codes():
+    sql = """
+        select distinct code from stock_share_change
+    """
+    codes = obtain_list_by_sql(sql)
+    return codes
 
 def delisted_data_2_local(code):
     file_path = f'data/stock_share_change_cninfo_2_local/delisted/{code}.txt'
