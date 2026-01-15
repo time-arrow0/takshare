@@ -70,7 +70,7 @@ def init_data_2_local():
     stock_codes_a = obtain_stock_codes_a()
     stock_set_delisted = obtain_stock_set_delisted()
     existed_codes = obtain_existed_codes()
-    temp_skip_codes = {'600200', '600849', '603352', '601112', '688785'}
+    temp_skip_codes = {'600200', '600849', '603352', '601112', '688785', '001220'}
     codes = []
     for code in stock_codes_a:
         if code in existed_codes:
