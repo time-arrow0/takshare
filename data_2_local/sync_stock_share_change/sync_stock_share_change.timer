@@ -2,7 +2,7 @@
 Description=Run sync_stock_share_change.sh periodically
 
 [Timer]
-OnCalendar=*-*-* 17:50:01
+OnCalendar=*-*-* 18:25:01
 Persistent=true
 
 [Install]
