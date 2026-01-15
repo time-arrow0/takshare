@@ -2,8 +2,6 @@ import os
 import sys
 from datetime import datetime
 
-from utils.holiday_utils import ChinaHolidayChecker
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import time
 
@@ -14,6 +12,7 @@ from dao.dao import obtain_list_by_sql
 from data_2_local.common_data_2_local import df_append_2_local
 from data_2_local.common_data_obtain import obtain_stock_codes_a, obtain_stock_set_delisted
 from utils.log_utils import setup_logger_simple_msg
+from utils.holiday_utils import ChinaHolidayChecker
 
 LOGGER = setup_logger_simple_msg(name='sync_stock_share_change')
 
@@ -223,9 +222,11 @@ def delisted_data_2_local_2():
     df['change_date'] = pd.to_datetime(df['change_date'])
     # df['change_reason'].astype(str)
     # print(df)
-    df['change_reason'] = df['change_reason'].astype(str).apply(lambda s : get_change_reason(s, change_reason_dict=change_reason_dict))
+    df['change_reason'] = df['change_reason'].astype(str).apply(
+        lambda s: get_change_reason(s, change_reason_dict=change_reason_dict))
     print(df)
     df_append_2_local(table_name=TABLE_NAME, df=df)
+
 
 def obtain_change_reason_dict():
     with open(file='data/big_quant_change_reason.txt', mode='r', encoding='utf-8') as f:
@@ -237,6 +238,7 @@ def obtain_change_reason_dict():
         tdict[flag] = reason
     return tdict
 
+
 def get_change_reason(flag_str, change_reason_dict):
     flags = flag_str.split(',')
     reasons = []
@@ -245,6 +247,7 @@ def get_change_reason(flag_str, change_reason_dict):
         reasons.append(reason)
     s = ','.join(reasons)
     return s
+
 
 def special_data_2_local():
     with open(file='data/stock_share_change_cninfo_2_local/delisted_codes.txt', mode='r', encoding='utf-8') as f:
