@@ -1,0 +1,9 @@
+[Unit]
+Description=Run sync_stock_list.sh periodically
+
+[Timer]
+OnCalendar=*-*-* 17:50:01
+Persistent=true
+
+[Install]
+WantedBy=timers.target

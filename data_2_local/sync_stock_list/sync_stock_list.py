@@ -1,15 +1,21 @@
 import os
+import sys
+from datetime import datetime
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import pandas as pd
 
 from dao.dao import execute_by_sql, insert_batch_single_column
 from data_2_local.common_data_obtain import obtain_stock_codes_a
+from utils.log_utils import setup_logger_simple_msg
+import akshare as ak
+
+LOGGER = setup_logger_simple_msg(name='stock_list_2_local')
 
 
 def data_2_local():
-    file_path = f'../t/hangqing.txt'
+    date_str = datetime.now().strftime("%Y%m%d")
     # 定义列名。turnover: 成交额
-
     column_mapping = {
         '序号': 'serial_no',
         '代码': 'code',
@@ -35,18 +41,15 @@ def data_2_local():
         '60日涨跌幅': 'change_60d',
         '年初至今涨跌幅': 'change_ytd'
     }
-    column_names = ['serial_no', 'code', 'name', 'latest_price', 'change_pct', 'change_amount', 'volume', 'turnover', 'amplitude', 'high', 'low', 'open', 'pre_close', 'volume_ratio', 'turnover_rate', 'pe_ratio', 'pb_ratio', 'total_market_cap', 'circulating_market_cap', 'change_speed', 'change_5min', 'change_60d', 'change_ytd']
-    dtype_dict = {
-        'code': str
-    }
-    df = pd.read_csv(file_path,
-                     sep=',',
-                     skiprows=1,
-                     # comment='#',  # 跳过以#开头的行
-                     skip_blank_lines=True,  # 跳过空行
-                     dtype=dtype_dict,
-                     names=column_names,
-                     encoding='utf-8')
+    # column_names = ['serial_no', 'code', 'name', 'latest_price', 'change_pct', 'change_amount', 'volume', 'turnover',
+    #                 'amplitude', 'high', 'low', 'open', 'pre_close', 'volume_ratio', 'turnover_rate', 'pe_ratio',
+    #                 'pb_ratio', 'total_market_cap', 'circulating_market_cap', 'change_speed', 'change_5min',
+    #                 'change_60d', 'change_ytd']
+    # dtype_dict = {
+    #     'code': str
+    # }
+    exist_stock_codes_a_set = set(obtain_stock_codes_a())
+    df = ak.stock_zh_a_spot_em()
     df.rename(columns=column_mapping, inplace=True)
     print(df.shape[0])
     series = df['code']
@@ -58,33 +61,46 @@ def data_2_local():
     sz_cy_codes = []
     prefix_set = set()
     for code in series:
+        # 如果已经存在，跳过
+        if code in exist_stock_codes_a_set:
+            continue
         prefix = code[:2]
         prefix_set.add(prefix)
-        if prefix == '60':
+        if prefix in {'60'}:
             sh_main_codes.append(code)
-        elif prefix == '68':
+        elif prefix in {'68'}:
             sh_kc_codes.append(code)
-        elif prefix == '00':
+        elif prefix in {'00'}:
             sz_main_codes.append(code)
-        elif prefix == '30':
+        elif prefix in {'30'}:
             sz_cy_codes.append(code)
 
     prefixes = list(prefix_set)
     prefixes.sort(key=lambda x: x)
     print(prefixes)
 
-    sh_main_sql = get_insert_sql('stocks_sh_main', sh_main_codes)
-    sh_kc_sql = get_insert_sql('stocks_sh_kc', sh_kc_codes)
-    sz_main_sql = get_insert_sql('stocks_sz_main', sz_main_codes)
-    sz_cy_sql = get_insert_sql('stocks_sz_cy', sz_cy_codes)
-    if sh_main_sql:
+    l0 = len(sh_main_codes)
+    if l0 != 0:
+        sh_main_sql = get_insert_sql('stocks_sh_main', sh_main_codes)
         execute_by_sql(sh_main_sql)
-    if sh_kc_sql:
+        LOGGER.info(f"{date_str}, sh_main, 新增{l0}条")
+    l1 = len(sh_kc_codes)
+    if l1 != 0:
+        sh_kc_sql = get_insert_sql('stocks_sh_kc', sh_kc_codes)
         execute_by_sql(sh_kc_sql)
-    if sz_main_sql:
+        LOGGER.info(f"{date_str}, sh_kc, 新增{l1}条")
+    l2 = len(sz_main_codes)
+    if l2 != 0:
+        sz_main_sql = get_insert_sql('stocks_sz_main', sz_main_codes)
         execute_by_sql(sz_main_sql)
-    if sz_cy_sql:
+        LOGGER.info(f"{date_str}, sz_main, 新增{l2}条")
+    l3 = len(sz_cy_codes)
+    if l3 != 0:
+        sz_cy_sql = get_insert_sql('stocks_sz_cy', sz_cy_codes)
         execute_by_sql(sz_cy_sql)
+        LOGGER.info(f"{date_str}, sz_cy, 新增{l3}条")
+    if l0 == 0 and l1 == 0 and l2 == 0 and l3 == 0:
+        LOGGER.info(f"{date_str}, 没有新增数据")
 
 def deleted_2_local():
     """
@@ -114,6 +130,7 @@ def get_insert_sql(table_name, codes):
     sql = sql + values_str
     return sql
 
+
 def obtain_big_quant_codes():
     with open(file='data/stock_list_2_local/big_quant_codes.txt', mode='r', encoding='utf-8') as f:
         content = f.read()
@@ -122,6 +139,7 @@ def obtain_big_quant_codes():
     for code in codes0:
         codes.append(code[:6])
     return codes
+
 
 def compare_codes():
     big_quant_codes = obtain_big_quant_codes()
@@ -133,6 +151,7 @@ def compare_codes():
     # big_quant有但db没有的
     print(big_quant_code_set - db_code_set)
 
+
 if __name__ == '__main__':
     # data_2_local()
     # t_table_name = 'tt'
@@ -141,4 +160,5 @@ if __name__ == '__main__':
     # print(tsql)
 
     # compare_codes()
-    deleted_2_local()
+    # deleted_2_local()
+    data_2_local()

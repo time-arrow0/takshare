@@ -1,0 +1,11 @@
+[Unit]
+Description=sync_stock_list sync service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/arrow/code/invest/takshare/data_2_local/sync_stock_list
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_stock_list/sync_stock_list.sh
+User=arrow
+
+[Install]
+WantedBy=multi-user.target
