@@ -75,6 +75,8 @@ def stock_share_change_cninfo(
     r = requests.post(url, params=params, headers=headers)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["records"])
+    if temp_df.shape[0] == 0:
+        return temp_df
     cols_map = {
         "SECCODE": "证券代码",
         "SECNAME": "证券简称",
