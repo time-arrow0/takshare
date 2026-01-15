@@ -101,7 +101,7 @@ def init_data_2_local():
         # code完成，向complete_codes.txt追加一条数据
         # with open(file='data/stock_share_change_cninfo_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
         #     f.write(f'{code}\n')
-        time.sleep(1)
+        time.sleep(0.5)
         i += 1
     print("结束")
 
