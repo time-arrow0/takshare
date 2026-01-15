@@ -72,6 +72,8 @@ def init_data_2_local():
             continue
         codes.append(code)
 
+    # print(existed_codes)
+    # print(codes[0])
     i = 0
     tlen = len(codes)
     print(f"代码数: {tlen}")
@@ -95,7 +97,10 @@ def obtain_existed_codes():
     sql = """
         select distinct code from stock_share_change
     """
-    codes = obtain_list_by_sql(sql)
+    tlist = obtain_list_by_sql(sql)
+    codes = []
+    for row in tlist:
+        codes.append(row[0])
     return codes
 
 def delisted_data_2_local(code):
