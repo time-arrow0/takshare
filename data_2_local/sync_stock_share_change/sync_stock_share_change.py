@@ -19,6 +19,7 @@ TABLE_NAME = "stock_share_change"
 
 
 def init_data_2_local():
+    date_str = datetime.now().strftime('%Y%m%d')
     column_rename_dict = {
         '证券简称': 'security_abbr',
         '机构名称': 'institution_name',
@@ -83,6 +84,9 @@ def init_data_2_local():
         if i % 200 == 0:
             print(f"进度: {i}/{tlen}")
         df = ak.stock_share_change_cninfo(symbol=code, start_date="20000101", end_date="20260114")
+        if df.shape[0] == 0:
+            LOGGER.info(f"{date_str}, {code}, 无数据")
+            continue
         df.rename(columns=column_rename_dict, inplace=True)
         df = df[["code", "security_abbr", "change_date", "change_reason", "total_shares",
                  "float_share", "restricted_float_share"]]
