@@ -120,6 +120,7 @@ def obtain_existed_codes():
         codes.append(row[0])
     return codes
 
+EXCLUDE_PREFIXES = {'20', '90', '92'}
 
 def sync_data():
     current_date = datetime.now().date()
@@ -144,9 +145,13 @@ def sync_data():
     }
     df = ak.stock_hold_change_cninfo(symbol="全部")
     df.rename(columns=column_rename_dict, inplace=True)
+    df = df[~df['code'].str[:2].isin(EXCLUDE_PREFIXES)].copy()
     df['change_date'] = pd.to_datetime(df['change_date'])
     df['unique_key'] = df['code'] + '-' + df['change_date'].dt.strftime('%Y%m%d')
     df = df[~df['unique_key'].isin(existed_key_set)].copy()
+    if df.shape[0] == 0:
+        LOGGER.info(f"{date_str}, 没有新数据")
+        return
     df['total_shares'] = df['total_shares'] * 10000
     df['float_share'] = df['float_share'] * 10000
     df['restricted_float_share'] = df['restricted_float_share'] * 10000
