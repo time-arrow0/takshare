@@ -1,0 +1,17 @@
+command:
+
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_stock_list/sync_stock_list.service /etc/systemd/system/sync_stock_list.service
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_stock_list/sync_stock_list.timer /etc/systemd/system/sync_stock_list.timer
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart sync_stock_list.service
+sudo systemctl restart sync_stock_list.timer
+
+sudo systemctl enable sync_stock_list.service
+sudo systemctl enable sync_stock_list.timer
+
+sudo systemctl status sync_stock_list.service
+sudo systemctl status sync_stock_list.timer
+
+sudo systemctl list-timers --all --no-pager
