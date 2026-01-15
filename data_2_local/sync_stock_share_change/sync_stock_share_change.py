@@ -1,5 +1,7 @@
 import os
 import sys
+from datetime import datetime
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import time
 
@@ -89,9 +91,10 @@ def init_data_2_local():
         # code完成，向complete_codes.txt追加一条数据
         # with open(file='data/stock_share_change_cninfo_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
         #     f.write(f'{code}\n')
-        time.sleep(0.5)
+        time.sleep(1)
         i += 1
     print("结束")
+
 
 def obtain_existed_codes():
     sql = """
@@ -102,6 +105,46 @@ def obtain_existed_codes():
     for row in tlist:
         codes.append(row[0])
     return codes
+
+
+def sync_data():
+    date_str = datetime.now().strftime('%Y%m%d')
+    existed_key_set = obtain_existed_key_set()
+    # print(existed_key_set)
+    column_rename_dict = {
+        '证券代码': 'code',
+        '证券简称': 'security_abbr',
+        '交易市场': 'market',
+        '公告日期': 'announcement_date',
+        '变动日期': 'change_date',
+        '变动原因': 'change_reason',
+        '总股本': 'total_shares',
+        '已流通股份': 'float_share',
+        '已流通比例': 'float_proportion',
+        '流通受限股份': 'restricted_float_share'
+    }
+    df = ak.stock_hold_change_cninfo(symbol="全部")
+    df.rename(columns=column_rename_dict, inplace=True)
+    df['change_date'] = pd.to_datetime(df['change_date'])
+    df['unique_key'] = df['code'] + '-' + df['change_date'].dt.strftime('%Y%m%d')
+    df = df[~df['unique_key'].isin(existed_key_set)].copy()
+
+    size = df.shape[0]
+    if size != 0:
+        df_append_2_local(table_name=TABLE_NAME, df=df)
+        LOGGER.info(f"{date_str}, 新增{size}条数据")
+
+
+def obtain_existed_key_set():
+    sql = """
+            select code, change_date from stock_share_change
+        """
+    tlist = obtain_list_by_sql(sql)
+    key_set = set()
+    for row in tlist:
+        key_set.add(f"{row[0]}-{row[1].strftime('%Y%m%d')}")
+    return key_set
+
 
 def delisted_data_2_local(code):
     file_path = f'data/stock_share_change_cninfo_2_local/delisted/{code}.txt'
@@ -166,3 +209,4 @@ if __name__ == '__main__':
     # create_delisted_files()
     # special_data_2_local()
     init_data_2_local()
+    # sync_data()
