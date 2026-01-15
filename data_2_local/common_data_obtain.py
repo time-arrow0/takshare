@@ -23,3 +23,16 @@ def obtain_stock_codes_a():
     for row in rows:
         codes.append(row[0])
     return codes
+
+def obtain_stock_set_delisted():
+    """
+    获取退市股列表
+    """
+    sql = """
+        SELECT CODE FROM stocks_delisted
+        """
+    rows = obtain_list_by_sql(sql)
+    codes = []
+    for row in rows:
+        codes.append(row[0])
+    return codes
