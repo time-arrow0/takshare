@@ -10,7 +10,7 @@ import akshare as ak
 from dao.dao import obtain_list_by_sql
 
 from data_2_local.common_data_2_local import df_append_2_local
-from data_2_local.common_data_obtain import obtain_stock_codes_a
+from data_2_local.common_data_obtain import obtain_stock_codes_a, obtain_stock_set_delisted
 from utils.log_utils import setup_logger_simple_msg
 
 LOGGER = setup_logger_simple_msg(name='sync_stock_share_change')
@@ -68,10 +68,13 @@ def init_data_2_local():
     }
 
     stock_codes_a = obtain_stock_codes_a()
+    stock_set_delisted = obtain_stock_set_delisted()
     existed_codes = obtain_existed_codes()
     codes = []
     for code in stock_codes_a:
         if code in existed_codes:
+            continue
+        if code in stock_set_delisted:
             continue
         codes.append(code)
 
