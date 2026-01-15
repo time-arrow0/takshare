@@ -5,10 +5,14 @@ import pandas as pd
 import akshare as ak
 
 from data_2_local.common_data_2_local import df_append_2_local
+from utils.log_utils import setup_logger_simple_msg
+
+LOGGER = setup_logger_simple_msg(name='sync_stock_share_change')
+
+TABLE_NAME = "stock_share_change"
 
 
-
-def data_2_local():
+def init_data_2_local():
     column_rename_dict = {
         '证券简称': 'security_abbr',
         '机构名称': 'institution_name',
@@ -18,10 +22,10 @@ def data_2_local():
         '国有法人持股': 'state_owned_corp_share',
         '配售法人股': 'placement_corp_share',
         '发起人股份': 'founder_share',
-        '未流通股份': 'non_tradable_share',
+        '未流通股份': 'non_float_share',
         '其中：境外自然人持股': 'foreign_individual_share',
         '其他流通受限股份': 'other_restricted_share',
-        '其他流通股': 'other_tradable_share',
+        '其他流通股': 'other_float_share',
         '外资持股-受限': 'foreign_share_restricted',
         '内部职工股': 'employee_share',
         '境外上市外资股-H股': 'h_share',
@@ -40,8 +44,8 @@ def data_2_local():
         '战略投资者持股': 'strategic_investor_share',
         '国家持股': 'state_share',
         '其中：限售B股': 'restricted_b_share',
-        '其他未流通股': 'other_non_tradable_share',
-        '流通受限股份': 'restricted_tradable_share',
+        '其他未流通股': 'other_non_float_share',
+        '流通受限股份': 'restricted_float_share',
         '优先股': 'preferred_share',
         '高管股': 'executive_share',
         '总股本': 'total_shares',
@@ -50,7 +54,7 @@ def data_2_local():
         '境内上市外资股-B股': 'b_share',
         '其中：境外法人持股': 'foreign_corp_share_2',
         '募集法人股': 'fundraising_corp_share',
-        '已流通股份': 'tradable_share',
+        '已流通股份': 'float_share',
         '其中：境内自然人持股': 'domestic_individual_share',
         '其他内资持股-受限': 'other_domestic_restricted',
         '变动原因编码': 'change_reason_code'
@@ -77,15 +81,23 @@ def data_2_local():
     # print(f'len_t_codes: {len(t_codes)}')
 
     t_codes = ['002334']
+    i = 0
+    tlen = len(t_codes)
     for code in t_codes:
-        df = ak.stock_share_change_cninfo(symbol=code, start_date="20000101", end_date="20251206")
-        df = df.rename(columns=column_rename_dict)
+        if i % 200 == 0:
+            print(f"进度: {i}/{tlen}")
+        df = ak.stock_share_change_cninfo(symbol=code, start_date="20000101", end_date="20260114")
+        df.rename(columns=column_rename_dict, inplace=True)
+        df = df[["code", "security_abbr", "change_date", "change_reason", "total_shares",
+                 "float_share", "restricted_float_share"]]
         # print(df)
-        df_append_2_local(table_name='stock_share_change_cninfo', df=df)
+        df_append_2_local(table_name=TABLE_NAME, df=df)
         # code完成，向complete_codes.txt追加一条数据
         # with open(file='data/stock_share_change_cninfo_2_local/complete_codes.txt', mode='a', encoding='utf-8') as f:
         #     f.write(f'{code}\n')
         # time.sleep(0.5)
+        i += 1
+
 
 def delisted_data_2_local(code):
     file_path = f'data/stock_share_change_cninfo_2_local/delisted/{code}.txt'
@@ -111,11 +123,13 @@ def delisted_data_2_local(code):
     df['change_date'] = pd.to_datetime(df['change_date'])
     df_append_2_local(table_name='stock_share_change_cninfo', df=df)
 
+
 def special_data_2_local():
     with open(file='data/stock_share_change_cninfo_2_local/delisted_codes.txt', mode='r', encoding='utf-8') as f:
         content = f.read()
         codes = content.split('\n')
-    with open(file='data/stock_share_change_cninfo_2_local/delisted_complete_codes.txt', mode='r', encoding='utf-8') as f:
+    with open(file='data/stock_share_change_cninfo_2_local/delisted_complete_codes.txt', mode='r',
+              encoding='utf-8') as f:
         content = f.read()
         t_complete_codes = content.split('\n')
         print(len(t_complete_codes) - 1)  # 减1是因为多个换行
@@ -124,8 +138,10 @@ def special_data_2_local():
         if code in complete_codes:
             continue
         delisted_data_2_local(code)
-        with open(file='data/stock_share_change_cninfo_2_local/delisted_complete_codes.txt', mode='a', encoding='utf-8') as f:
+        with open(file='data/stock_share_change_cninfo_2_local/delisted_complete_codes.txt', mode='a',
+                  encoding='utf-8') as f:
             f.write(f'{code}\n')
+
 
 def create_delisted_files():
     with open(file='data/stock_share_change_cninfo_2_local/delisted_codes.txt', mode='r', encoding='utf-8') as f:
@@ -136,6 +152,7 @@ def create_delisted_files():
         if not os.path.exists(file_path):
             open(file_path, 'w')
 
+
 if __name__ == '__main__':
     pd.set_option('display.max_rows', None)  # 设置行数为无限制
     pd.set_option('display.max_columns', None)  # 设置列数为无限制
@@ -143,7 +160,5 @@ if __name__ == '__main__':
     pd.set_option('display.colheader_justify', 'left')  # 设置列标题靠左
 
     # create_delisted_files()
-    special_data_2_local()
-
-
-
+    # special_data_2_local()
+    init_data_2_local()
