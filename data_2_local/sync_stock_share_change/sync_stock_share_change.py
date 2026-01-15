@@ -2,6 +2,8 @@ import os
 import sys
 from datetime import datetime
 
+from utils.holiday_utils import ChinaHolidayChecker
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import time
 
@@ -94,6 +96,9 @@ def init_data_2_local():
             LOGGER.info(f"{date_str}, {code}, 无数据")
             continue
         df.rename(columns=column_rename_dict, inplace=True)
+        df['total_shares'] = df['total_shares'] * 10000
+        df['float_share'] = df['float_share'] * 10000
+        df['restricted_float_share'] = df['restricted_float_share'] * 10000
         df = df[["code", "security_abbr", "change_date", "change_reason", "total_shares",
                  "float_share", "restricted_float_share"]]
         # print(df)
@@ -118,7 +123,12 @@ def obtain_existed_codes():
 
 
 def sync_data():
-    date_str = datetime.now().strftime('%Y%m%d')
+    current_date = datetime.now().date()
+    # 如果当天不是工作日，不操作
+    if not ChinaHolidayChecker.is_workday(current_date):
+        LOGGER.info(f'{current_date}不是工作日, 不操作')
+        return
+    date_str = current_date.strftime('%Y%m%d')
     existed_key_set = obtain_existed_key_set()
     # print(existed_key_set)
     column_rename_dict = {
@@ -138,9 +148,14 @@ def sync_data():
     df['change_date'] = pd.to_datetime(df['change_date'])
     df['unique_key'] = df['code'] + '-' + df['change_date'].dt.strftime('%Y%m%d')
     df = df[~df['unique_key'].isin(existed_key_set)].copy()
+    df['total_shares'] = df['total_shares'] * 10000
+    df['float_share'] = df['float_share'] * 10000
+    df['restricted_float_share'] = df['restricted_float_share'] * 10000
 
     size = df.shape[0]
     if size != 0:
+        df = df[["code", "security_abbr", "market", "change_date", "change_reason", "total_shares",
+                 "float_share", "restricted_float_share"]]
         df_append_2_local(table_name=TABLE_NAME, df=df)
         LOGGER.info(f"{date_str}, 新增{size}条数据")
 
@@ -181,6 +196,56 @@ def delisted_data_2_local(code):
     df_append_2_local(table_name='stock_share_change_cninfo', df=df)
 
 
+def delisted_data_2_local_2():
+    file_path = f'data/delisted_stock_share_change.txt'
+    column_names = ['code', 'change_date', 'change_reason', 'total_shares', 'float_share', 'restricted_float_share']
+    dtype_dict = {
+        'total_shares': 'float64',
+        'float_share': 'float64',
+        'restricted_float_share': 'float64',
+    }
+    change_reason_dict = obtain_change_reason_dict()
+    df = pd.read_csv(file_path,
+                     sep=',',
+                     skiprows=1,
+                     # comment='#',  # 跳过以#开头的行
+                     skip_blank_lines=True,  # 跳过空行
+                     names=column_names,
+                     dtype=dtype_dict,
+                     encoding='utf-8')
+    # column_rename_dict = {
+    #     'day': 'change_date',
+    #     'capitalization': 'total_shares',
+    #     'circulating_cap': 'a_share',
+    # }
+    # df = df.rename(columns=column_rename_dict)
+    df['code'] = df['code'].str[:6]
+    df['change_date'] = pd.to_datetime(df['change_date'])
+    # df['change_reason'].astype(str)
+    # print(df)
+    df['change_reason'] = df['change_reason'].astype(str).apply(lambda s : get_change_reason(s, change_reason_dict=change_reason_dict))
+    print(df)
+    df_append_2_local(table_name=TABLE_NAME, df=df)
+
+def obtain_change_reason_dict():
+    with open(file='data/big_quant_change_reason.txt', mode='r', encoding='utf-8') as f:
+        content = f.read()
+    tlist = content.split('\n')
+    tdict = {}
+    for row_str in tlist:
+        flag, reason = row_str.split('\t')
+        tdict[flag] = reason
+    return tdict
+
+def get_change_reason(flag_str, change_reason_dict):
+    flags = flag_str.split(',')
+    reasons = []
+    for flag in flags:
+        reason = change_reason_dict[flag]
+        reasons.append(reason)
+    s = ','.join(reasons)
+    return s
+
 def special_data_2_local():
     with open(file='data/stock_share_change_cninfo_2_local/delisted_codes.txt', mode='r', encoding='utf-8') as f:
         content = f.read()
@@ -218,5 +283,10 @@ if __name__ == '__main__':
 
     # create_delisted_files()
     # special_data_2_local()
-    init_data_2_local()
-    # sync_data()
+    # init_data_2_local()
+
+    # t_change_reason_dict = obtain_change_reason_dict()
+    # print(t_change_reason_dict)
+    # delisted_data_2_local_2()
+
+    sync_data()
