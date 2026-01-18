@@ -388,7 +388,6 @@
  "stock_comment_detail_zhpj_lspf_em"  # 综合评价-历史评分
  "stock_comment_detail_scrd_focus_em"  # 市场热度-用户关注指数
  "stock_comment_detail_scrd_desire_em"  # 市场热度-市场参与意愿
- "stock_comment_detail_scrd_desire_daily_em"  # 市场热度-日度市场参与意愿
  # 沪深港通
  "stock_hk_ggt_components_em"  # 港股通成份股
  "stock_hsgt_hold_stock_em"  # 沪深港通持股-个股排行
@@ -482,7 +481,7 @@
  "stock_a_high_low_statistics"  # 创新高和新低的股票数量
  "stock_a_below_net_asset_statistics"  # 破净股统计
  # 交易日历
- "tool_trade_date_hist"  # 新浪财经-交易日历
+ "tool_trade_date_hist_sina"  # 新浪财经-交易日历
  # 基金行情
  "fund_etf_category_sina"  # 基金实时行情-新浪
  "fund_etf_hist_sina"  # 基金行情-新浪

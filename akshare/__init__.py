@@ -3209,9 +3209,19 @@ amac_manager_cancelled_info # 中国证券投资基金业协会-信息公示-诚
 1.18.1 fix: fix stock_us_valuation_baidu interface
 1.18.2 fix: fix stock_ipo_declare_em interface
 1.18.3 fix: fix stock_ipo_tutor_em interface
+1.18.4 fix: fix stock_zh_a_daily interface
+1.18.5 fix: fix futures_inventory_99 interface
+1.18.6 fix: fix fund_fee_em interface
+1.18.7 fix: fix stock_us_valuation_baidu interface
+1.18.8 fix: fix stock_zh_valuation_comparison_em interface
+1.18.9 fix: fix fx_quote_baidu interface
+1.18.10 fix: fix futures_comm_info interface
+1.18.11 fix: fix stock_individual_spot_xq interface
+1.18.12 fix: fix news_economic_baidu interface
+1.18.13 fix: fix futures_spot_price_daily interface
 """
 
-__version__ = "1.18.3"
+__version__ = "1.18.13"
 __author__ = "AKFamily"
 
 import sys
@@ -3814,6 +3824,12 @@ from akshare.stock_feature.stock_zh_valuation_baidu import stock_zh_valuation_ba
 百度股市通-港股-财务报表-估值数据
 """
 from akshare.stock_feature.stock_hk_valuation_baidu import stock_hk_valuation_baidu
+
+"""
+百度股市通-美股-财务报表-估值数据
+"""
+from akshare.stock_feature.stock_us_valuation_baidu import stock_us_valuation_baidu
+
 
 """
 巨潮资讯-个股-公司概况
@@ -5100,7 +5116,6 @@ from akshare.stock_feature.stock_comment_em import (
     stock_comment_detail_scrd_focus_em,
     stock_comment_detail_zhpj_lspf_em,
     stock_comment_detail_scrd_desire_em,
-    stock_comment_detail_scrd_desire_daily_em,
 )
 
 """

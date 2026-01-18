@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2025/3/20 19:00
+Date: 2026/1/9 22:00
 Desc: 新浪财经-A股-实时行情数据和历史行情数据(包含前复权和后复权因子)
 https://finance.sina.com.cn/realstock/company/sh689009/nc.shtml
 """
@@ -21,7 +21,7 @@ from akshare.stock.cons import (
     hk_js_decode,
     zh_sina_a_stock_hfq_url,
     zh_sina_a_stock_qfq_url,
-    zh_sina_a_stock_amount_url,
+    zh_sina_a_stock_amount_url
 )
 from akshare.utils import demjson
 from akshare.utils.tqdm import get_tqdm
@@ -194,7 +194,7 @@ def stock_zh_a_daily(
         pass
     data_df = data_df.astype("float")
     r = requests.get(zh_sina_a_stock_amount_url.format(symbol, symbol))
-    amount_data_json = demjson.decode(r.text[r.text.find("[") : r.text.rfind("]") + 1])
+    amount_data_json = demjson.decode(r.text[r.text.find("["): r.text.rfind("]") + 1])
     amount_data_df = pd.DataFrame(amount_data_json)
     amount_data_df.columns = ["date", "outstanding_share"]
     amount_data_df.index = pd.to_datetime(amount_data_df.date)
@@ -429,7 +429,7 @@ def stock_zh_a_minute(
         need_df.index = pd.to_datetime(need_df["date"])
         stock_zh_a_daily_qfq_df = stock_zh_a_daily(symbol=symbol, adjust="qfq")
         stock_zh_a_daily_qfq_df.index = pd.to_datetime(stock_zh_a_daily_qfq_df["date"])
-        result_df = stock_zh_a_daily_qfq_df.iloc[-len(need_df) :, :]["close"].astype(
+        result_df = stock_zh_a_daily_qfq_df.iloc[-len(need_df):, :]["close"].astype(
             float
         ) / need_df["close"].astype(float)
         temp_df.index = pd.to_datetime(temp_df["date"])
@@ -454,7 +454,7 @@ def stock_zh_a_minute(
         need_df.index = pd.to_datetime(need_df["date"])
         stock_zh_a_daily_hfq_df = stock_zh_a_daily(symbol=symbol, adjust="hfq")
         stock_zh_a_daily_hfq_df.index = pd.to_datetime(stock_zh_a_daily_hfq_df["date"])
-        result_df = stock_zh_a_daily_hfq_df.iloc[-len(need_df) :, :]["close"].astype(
+        result_df = stock_zh_a_daily_hfq_df.iloc[-len(need_df):, :]["close"].astype(
             float
         ) / need_df["close"].astype(float)
         temp_df.index = pd.to_datetime(temp_df["date"])
@@ -472,9 +472,9 @@ def stock_zh_a_minute(
 
 if __name__ == "__main__":
     stock_zh_a_daily_hfq_df_one = stock_zh_a_daily(
-        symbol="sz000001",
+        symbol="sz000002",
         start_date="19910403",
-        end_date="20231027",
+        end_date="20260109",
         adjust="hfq",
     )
     print(stock_zh_a_daily_hfq_df_one)

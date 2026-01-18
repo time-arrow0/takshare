@@ -89,6 +89,51 @@
 
 ## 更新说明详情
 
+1.18.13 fix: fix futures_spot_price_daily interface
+
+	1. 修复 futures_spot_price_daily 接口
+
+1.18.12 fix: fix news_economic_baidu interface
+
+	1. 修复 news_economic_baidu 接口
+
+1.18.11 fix: fix stock_individual_spot_xq interface
+
+	1. 修复 stock_individual_spot_xq 接口
+	2. 修复 stock_margin_ratio_pa 接口
+
+1.18.10 fix: fix futures_comm_info interface
+
+	1. 修复 futures_comm_info 接口
+	2. 修复 index_detail_hist_cni 接口
+
+1.18.9 fix: fix fx_quote_baidu interface
+
+	1. 修复 fx_quote_baidu 接口
+	2. 修复 stock_zh_a_daily 接口
+
+1.18.8 fix: fix stock_zh_valuation_comparison_em interface
+
+	1. 修复 stock_zh_valuation_comparison_em 接口
+
+1.18.7 fix: fix stock_us_valuation_baidu interface
+
+	1. 修复 stock_us_valuation_baidu 接口
+	2. 修复 tool_trade_date_hist_sina 接口
+
+1.18.6 fix: fix fund_fee_em interface
+
+	1. 修复 fund_fee_em 接口
+
+1.18.5 fix: fix futures_inventory_99 interface
+
+	1. 修复 futures_inventory_99 接口
+	2. 修复 stock_comment_detail_scrd_desire_em 接口
+
+1.18.4 fix: fix stock_zh_a_daily interface
+
+	1. 修复 stock_zh_a_daily 接口
+
 1.18.3 fix: fix stock_ipo_tutor_em interface
 
 	1. 修复 stock_ipo_tutor_em 接口
@@ -6034,6 +6079,26 @@
     3. 修改 air_quality_hist 接口的请求日期格式，从 '2022-01-01' 为 '20220101'
 
 ## 版本更新说明
+
+1.18.13 fix: fix futures_spot_price_daily interface
+
+1.18.12 fix: fix news_economic_baidu interface
+
+1.18.11 fix: fix stock_individual_spot_xq interface
+
+1.18.10 fix: fix futures_comm_info interface
+
+1.18.9 fix: fix fx_quote_baidu interface
+
+1.18.8 fix: fix stock_zh_valuation_comparison_em interface
+
+1.18.7 fix: fix stock_us_valuation_baidu interface
+
+1.18.6 fix: fix fund_fee_em interface
+
+1.18.5 fix: fix futures_inventory_99 interface
+
+1.18.4 fix: fix stock_zh_a_daily interface
 
 1.18.3 fix: fix stock_ipo_tutor_em interface
 
