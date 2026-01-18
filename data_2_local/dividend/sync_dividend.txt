@@ -1,0 +1,17 @@
+command:
+
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/dividend/sync_dividend.service /etc/systemd/system/sync_dividend.service
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/dividend/sync_dividend.timer /etc/systemd/system/sync_dividend.timer
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart sync_dividend.timer
+sudo systemctl restart sync_dividend.service
+
+sudo systemctl enable sync_dividend.timer
+sudo systemctl enable sync_dividend.service
+
+sudo systemctl status sync_dividend.timer
+sudo systemctl status sync_dividend.service
+
+sudo systemctl list-timers --all --no-pager

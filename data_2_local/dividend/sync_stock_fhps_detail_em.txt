@@ -1,0 +1,17 @@
+command:
+
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/dividend/sync_stock_fhps_detail_em.service /etc/systemd/system/sync_stock_fhps_detail_em.service
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/dividend/sync_stock_fhps_detail_em.timer /etc/systemd/system/sync_stock_fhps_detail_em.timer
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart sync_stock_fhps_detail_em.timer
+sudo systemctl restart sync_stock_fhps_detail_em.service
+
+sudo systemctl enable sync_stock_fhps_detail_em.timer
+sudo systemctl enable sync_stock_fhps_detail_em.service
+
+sudo systemctl status sync_stock_fhps_detail_em.timer
+sudo systemctl status sync_stock_fhps_detail_em.service
+
+sudo systemctl list-timers --all --no-pager
