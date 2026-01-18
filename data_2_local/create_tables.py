@@ -219,7 +219,7 @@ def create_qfq_daily_stock_price_sz_main_table():
         print(f"创建表 {table_name} 时出错: {e}")
         return False
 
-def create_bfq_daily_stock_price_sz_main_table():
+def create_bfq_daily_stock_price_sz_main():
     """
     日K中小板股票价格不复权数据，包含深市主板所有代码。注意：中小板已经合并进主板，现在只能根据399101确定中小板列表
     不复权数据
@@ -235,7 +235,114 @@ def create_bfq_daily_stock_price_sz_main_table():
             `close` DECIMAL(8,4)    COMMENT '收盘' ,
             `high` DECIMAL(8,4)    COMMENT '最高' ,
             `low` DECIMAL(8,4)    COMMENT '最低' ,
-            `pct_chg` DECIMAL(6,3)    COMMENT '涨跌幅' ,
+            `volume` BIGINT    COMMENT '成交量' ,
+            `turnover` DECIMAL(20,4)    COMMENT '成交额' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '不复权-日K-股票价格数据-深市主板';
+        """
+        idx_0_sql = f"""
+        CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, date);
+        """
+        idx_1_sql = f"""
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(date);
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+            connection.execute(text(idx_0_sql))
+            connection.execute(text(idx_1_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_bfq_daily_stock_price_sz_cy():
+    """
+    日K中小板股票价格不复权数据，包含深市主板所有代码。注意：中小板已经合并进主板，现在只能根据399101确定中小板列表
+    不复权数据
+    """
+    table_name = 'bfq_daily_stock_price_sz_cy'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            `date` DATE NOT NULL   COMMENT '日期' ,
+            `open` DECIMAL(8,4)    COMMENT '开盘' ,
+            `close` DECIMAL(8,4)    COMMENT '收盘' ,
+            `high` DECIMAL(8,4)    COMMENT '最高' ,
+            `low` DECIMAL(8,4)    COMMENT '最低' ,
+            `volume` BIGINT    COMMENT '成交量' ,
+            `turnover` DECIMAL(20,4)    COMMENT '成交额' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '不复权-日K-股票价格数据-深市主板';
+        """
+        idx_0_sql = f"""
+        CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, date);
+        """
+        idx_1_sql = f"""
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(date);
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+            connection.execute(text(idx_0_sql))
+            connection.execute(text(idx_1_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_bfq_daily_stock_price_sh_main():
+    """
+    日K中小板股票价格不复权数据，包含深市主板所有代码。注意：中小板已经合并进主板，现在只能根据399101确定中小板列表
+    不复权数据
+    """
+    table_name = 'bfq_daily_stock_price_sh_main'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            `date` DATE NOT NULL   COMMENT '日期' ,
+            `open` DECIMAL(8,4)    COMMENT '开盘' ,
+            `close` DECIMAL(8,4)    COMMENT '收盘' ,
+            `high` DECIMAL(8,4)    COMMENT '最高' ,
+            `low` DECIMAL(8,4)    COMMENT '最低' ,
+            `volume` BIGINT    COMMENT '成交量' ,
+            `turnover` DECIMAL(20,4)    COMMENT '成交额' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '不复权-日K-股票价格数据-深市主板';
+        """
+        idx_0_sql = f"""
+        CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, date);
+        """
+        idx_1_sql = f"""
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(date);
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+            connection.execute(text(idx_0_sql))
+            connection.execute(text(idx_1_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_bfq_daily_stock_price_sh_kc():
+    """
+    日K中小板股票价格不复权数据，包含深市主板所有代码。注意：中小板已经合并进主板，现在只能根据399101确定中小板列表
+    不复权数据
+    """
+    table_name = 'bfq_daily_stock_price_sh_kc'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            `date` DATE NOT NULL   COMMENT '日期' ,
+            `open` DECIMAL(8,4)    COMMENT '开盘' ,
+            `close` DECIMAL(8,4)    COMMENT '收盘' ,
+            `high` DECIMAL(8,4)    COMMENT '最高' ,
+            `low` DECIMAL(8,4)    COMMENT '最低' ,
             `volume` BIGINT    COMMENT '成交量' ,
             `turnover` DECIMAL(20,4)    COMMENT '成交额' ,
             PRIMARY KEY (id)
@@ -292,42 +399,6 @@ def create_bfq_daily_etf_price_table():
         print(f"创建表 {table_name} 时出错: {e}")
         return False
 
-def create_daily_stock_cir_sz_main_table():
-    """
-    每日中小板股票市值数据，包含深市主板所有代码。注意：中小板已经合并进主板，现在只能根据399101确定中小板列表
-    不复权数据
-    """
-    table_name = 'bfq_daily_stock_price_sz_main'
-    try:
-        create_sql = f"""
-        CREATE TABLE {table_name}(
-            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
-            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
-            `date` DATE NOT NULL   COMMENT '日期' ,
-            `open` DECIMAL(8,4)    COMMENT '开盘' ,
-            `close` DECIMAL(8,4)    COMMENT '收盘' ,
-            `high` DECIMAL(8,4)    COMMENT '最高' ,
-            `low` DECIMAL(8,4)    COMMENT '最低' ,
-            `pct_chg` DECIMAL(6,3)    COMMENT '涨跌幅' ,
-            `volume` BIGINT    COMMENT '成交量' ,
-            `turnover` DECIMAL(20,4)    COMMENT '成交额' ,
-            PRIMARY KEY (id)
-        )  COMMENT = '不复权-日K-股票价格数据-深市主板';
-        """
-        idx_0_sql = f"""
-        CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, date);
-        """
-        idx_1_sql = f"""
-        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(date);
-        """
-        with engine.begin() as connection:
-            connection.execute(text(create_sql))
-            connection.execute(text(idx_0_sql))
-            connection.execute(text(idx_1_sql))
-        return True
-    except Exception as e:
-        print(f"创建表 {table_name} 时出错: {e}")
-        return False
 
 def create_shenwan_industry_2_table():
     """优化版的单个表创建函数"""
@@ -382,6 +453,79 @@ def create_code_industry_2_change_table():
         print(f"创建表 {table_name} 时出错: {e}")
         return False
 
+def create_stock_industry_change_cninfo_inc():
+    """
+    上市公司行业归属的变动情况，新增、删除、修改
+    数据从接口"http://webapi.cninfo.com.cn/api/load/p_stock2110_inc"获取，参考akshare的"stock_industry_change_cninfo"接口写的获取方法
+    注意，一个代码，一个日期，可能有2条不同的行业信息数据，代码-日期不是唯一的，代码-日期-分类标准编码-行业编码才是唯一的
+    """
+    table_name = 'stock_industry_change_cninfo_inc'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `objectid` bigint(20) NOT NULL COMMENT '记录ID',
+            `orgname` varchar(100) DEFAULT NULL COMMENT '机构名称',
+            `seccode` varchar(10) NOT NULL COMMENT '证券代码',
+            `secname` varchar(40) DEFAULT NULL COMMENT '新证券简称',
+            `varydate` date NOT NULL COMMENT '变更日期',
+            `f001v` varchar(12) DEFAULT NULL COMMENT '分类标准编码',
+            `f002v` varchar(60) DEFAULT NULL COMMENT '分类标准',
+            `f003v` varchar(12) DEFAULT NULL COMMENT '行业编码',
+            `f004v` varchar(60) DEFAULT NULL COMMENT '行业门类',
+            `f005v` varchar(60) DEFAULT NULL COMMENT '行业次类',
+            `f006v` varchar(60) DEFAULT NULL COMMENT '行业大类',
+            `f007v` varchar(60) DEFAULT NULL COMMENT '行业中类',
+            `f008c` char(1) DEFAULT NULL COMMENT '最新记录标识',
+            `change_code` int DEFAULT NULL COMMENT '更新状态. 1:新增 2:删除 3:修改',
+            PRIMARY KEY (id)
+        )  COMMENT = '上市公司行业归属的变动情况';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stock_industry_change():
+    """
+    股票行业变化。根据stock_industry_change_cninfo_inc的变化记录生成
+    stock_industry_change_cninfo_inc.change_code: 更新状态. 1:新增 2:删除 3:修改
+    删除是根据secode(证券代码)+f003v(行业编码)确定唯一性的
+    """
+    table_name = 'stock_industry_change'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+            `code` varchar(10) NOT NULL COMMENT '证券代码',
+            `security_name` varchar(40) DEFAULT NULL COMMENT '新证券简称',
+            `organization_name` varchar(100) DEFAULT NULL COMMENT '机构名称',
+            `start_date` date NOT NULL COMMENT '开始日期',
+            `industry_code` varchar(12) DEFAULT NULL COMMENT '行业编码',
+            `industry_category` varchar(60) DEFAULT NULL COMMENT '行业门类',
+            `industry_sub_category` varchar(60) DEFAULT NULL COMMENT '行业次类',
+            `industry_major_category` varchar(60) DEFAULT NULL COMMENT '行业大类',
+            `industry_medium_category` varchar(60) DEFAULT NULL COMMENT '行业中类',
+            PRIMARY KEY (id)
+        )  COMMENT = '股票行业变化, 证监会行业分类标准';
+        """
+        idx_0_sql = f"""
+        CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, start_date, industry_code);
+        """
+        idx_1_sql = f"""
+            CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(start_date);
+            """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+            connection.execute(text(idx_0_sql))
+            connection.execute(text(idx_1_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
 
 def create_code_is_st_change_table():
     """
@@ -410,20 +554,21 @@ def create_code_is_st_change_table():
         return False
 
 
-def create_code_name_change_table():
+def create_stock_name_change_table():
     """
     股票曾用名变化表
     """
-    table_name = 'code_name_change'
+    table_name = 'stock_name_change'
     try:
         create_sql = f"""
         CREATE TABLE {table_name}(
             `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
             `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
             `start_date` DATE NOT NULL   COMMENT '起始日期' ,
-            `name` VARCHAR(30) NOT NULL   COMMENT '二级行业代码' ,
+            `name` VARCHAR(30) NOT NULL   COMMENT '名称' ,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
-        )  COMMENT = '股票曾用名变化表';
+        )  COMMENT = '股票曾用名变化';
         """
         idx_sql = f"""
         CREATE UNIQUE INDEX {PREFIX_IDX}{table_name} ON {table_name}(code, start_date);
@@ -528,6 +673,26 @@ def create_stocks_sz_cy():
             `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
             PRIMARY KEY (id)
         )  COMMENT = '股票列表-深市创业板';
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
+def create_stocks_delisted():
+    """
+    股票列表-已摘牌股票
+    """
+    table_name = 'stocks_delisted'
+    try:
+        create_sql = f"""
+        CREATE TABLE {table_name}(
+            `id` INT NOT NULL AUTO_INCREMENT  COMMENT '' ,
+            `code` CHAR(6) NOT NULL   COMMENT '股票代码' ,
+            PRIMARY KEY (id)
+        )  COMMENT = '股票列表-已摘牌股票';
         """
         with engine.begin() as connection:
             connection.execute(text(create_sql))
@@ -765,6 +930,43 @@ def create_stock_share_change_cninfo_table():
         print(f"创建表 {table_name} 时出错: {e}")
         return False
 
+def create_stock_share_change():
+    """
+    复权因子。按照baostock数据格式。BaoStock的实现中，adjustFactor（本次复权因子）被设计为向后复权的累积因子，和想后复权因子值一样，这里不存
+    """
+    table_name = 'stock_share_change'
+    try:
+        create_sql = f"""
+            CREATE TABLE {table_name} (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                code VARCHAR(20) NOT NULL COMMENT '证券代码',
+                security_abbr VARCHAR(20) COMMENT '证券简称',
+                market VARCHAR(10) COMMENT '交易市场',
+                change_date DATE NOT NULL COMMENT '变动日期',
+                change_reason VARCHAR(100) COMMENT '变动原因',
+                total_shares DECIMAL(20, 4) COMMENT '总股本',
+                float_share DECIMAL(20, 4) COMMENT '已流通股份',
+                float_proportion DECIMAL(20, 4) COMMENT '已流通比例',
+                restricted_float_share DECIMAL(20, 4) COMMENT '流通受限股份',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) COMMENT='股本变动';
+            """
+        idx_0_sql = f"""
+            CREATE UNIQUE INDEX {PREFIX_IDX}{table_name}_0 ON {table_name}(code, change_date);
+            """
+        idx_1_sql = f"""
+        CREATE INDEX {PREFIX_IDX}{table_name}_1 ON {table_name}(change_date);
+        """
+        with engine.begin() as connection:
+            connection.execute(text(create_sql))
+            connection.execute(text(idx_0_sql))
+            connection.execute(text(idx_1_sql))
+        return True
+    except Exception as e:
+        print(f"创建表 {table_name} 时出错: {e}")
+        return False
+
 def create_stock_listing_date_table():
     """
     复权因子。按照baostock数据格式。BaoStock的实现中，adjustFactor（本次复权因子）被设计为向后复权的累积因子，和想后复权因子值一样，这里不存
@@ -944,23 +1146,27 @@ if __name__ == '__main__':
 
     # create_shenwan_industry_2_table()
     # create_code_industry_2_change_table()
+    # create_stock_industry_change_cninfo_inc()
+    # create_stock_industry_change()
     # create_code_is_st_change_table()
     # create_code_name_change_table()
 
     # create_index_stocks_399101_table()
     # create_temp_table()
 
-    # create_qfq_daily_stock_price_sz_main_table()
-
     # create_adjust_factor_table()
     # create_stock_share_change_cninfo_table()
+    create_stock_share_change()
 
-    # create_bfq_daily_stock_price_sz_main_table()
+    # create_bfq_daily_stock_price_sz_main()
+    # create_bfq_daily_stock_price_sz_cy()
+    # create_bfq_daily_stock_price_sh_main()
+    # create_bfq_daily_stock_price_sh_kc()
 
     # create_stock_listing_date_table()
     # create_bfq_daily_etf_price_table()
 
-    create_dividend()
+    # create_dividend()
     # create_stock_fhps_detail_em()
     # create_stock_fhps_detail_ths()
     # create_delisted_middle_small()
@@ -969,3 +1175,6 @@ if __name__ == '__main__':
     # create_stocks_sh_kc()
     # create_stocks_sz_main()
     # create_stocks_sz_cy()
+    # create_stocks_delisted()
+
+    # create_stock_name_change_table()
