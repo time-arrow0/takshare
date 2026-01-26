@@ -286,22 +286,22 @@ def sync_delisted():
 
 
 
-def em_web_interface_data_2_local(flag='1111'):
+def web_interface_data_2_local_em(flag='1111'):
     """
     东财接口，被封IP了，暂不用
     每日收盘后，通过网络接口获取数据，写入数据库
     """
     current_date = datetime.now().date()
     date_str = current_date.strftime('%Y%m%d')
-    # 如果当天不是工作日，不操作
-    if not ChinaHolidayChecker.is_workday(current_date):
-        LOGGER.info(f'{current_date}不是工作日, 不操作')
-        return
-    # 进一步检查，判断指数是否有数据，指数有数据才运行
-    index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
-    if index_df.shape[0] == 0:
-        LOGGER.info(f'{current_date}指数无数据, 不操作')
-        return
+    # # 如果当天不是工作日，不操作
+    # if not ChinaHolidayChecker.is_workday(current_date):
+    #     LOGGER.info(f'{current_date}不是工作日, 不操作')
+    #     return
+    # # 进一步检查，判断指数是否有数据，指数有数据才运行
+    # index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
+    # if index_df.shape[0] == 0:
+    #     LOGGER.info(f'{current_date}指数无数据, 不操作')
+    #     return
     # 如果所有市场今日已有数据，不再运行
     # 查询4个市场数据最大日期
     sql = """
@@ -432,9 +432,9 @@ def em_web_interface_data_2_local(flag='1111'):
     # 更新名称变化数据
     sync_name_change(date_str, df[['code', 'name']])
 
-def web_interface_data_2_local(flag='1111'):
+def web_interface_data_2_local_sina(flag='1111'):
     """
-    东财接口，被封IP了，暂不用
+    新浪接口，被封IP了，暂不用
     每日收盘后，通过网络接口获取数据，写入数据库
     """
     current_date = datetime.now().date()
@@ -563,4 +563,5 @@ if __name__ == '__main__':
     # tdx_file_data_2_local(t_dir)
     # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
     # tdx_file_single_date_data_2_local(t_dir, '20260107')
-    web_interface_data_2_local()
+    web_interface_data_2_local_em()
+    # web_interface_data_2_local_sina()
