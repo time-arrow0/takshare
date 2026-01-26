@@ -28,7 +28,8 @@ if __name__ == '__main__':
     # print(stock_fhps_em_df)
 
 
-    # stock_zh_a_spot_em_df = ak.stock_zh_a_spot_em()
+    stock_zh_a_spot_em_df = ak.stock_zh_a_spot_em()
+    print(stock_zh_a_spot_em_df)
     # filepath = 'hangqing.txt'
     # stock_zh_a_spot_em_df.to_csv(filepath, index=False)
 
@@ -54,5 +55,5 @@ if __name__ == '__main__':
     # stock_financial_abstract_df = ak.stock_financial_abstract(symbol="600004")
     # print(stock_financial_abstract_df)
 
-    stock_zh_a_spot_df = ak.stock_zh_a_spot()
-    print(stock_zh_a_spot_df)
+    # stock_zh_a_spot_df = ak.stock_zh_a_spot()
+    # print(stock_zh_a_spot_df)
