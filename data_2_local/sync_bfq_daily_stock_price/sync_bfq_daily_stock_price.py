@@ -286,8 +286,9 @@ def sync_delisted():
 
 
 
-def web_interface_data_2_local(flag='1111'):
+def em_web_interface_data_2_local(flag='1111'):
     """
+    东财接口，被封IP了，暂不用
     每日收盘后，通过网络接口获取数据，写入数据库
     """
     current_date = datetime.now().date()
@@ -406,6 +407,130 @@ def web_interface_data_2_local(flag='1111'):
     # 转换类型
     df = df.astype(dtype_dict)
     df['code'] = df['code'].astype('str')
+    df['name'] = df['name'].astype('str')
+    # 只取在需同步前缀列表中的数据
+    df['prefix'] = df['code'].str[:2]
+    unique_prefixes = df['prefix'].unique()
+    LOGGER.info(f'{date_str}, unique_prefixes: {unique_prefixes}')
+    LOGGER.info(f'{date_str}, df size: {df.shape[0]}')
+    df = df[df['prefix'].isin(sync_prefix_set)].copy()
+    df['date'] = date_str
+    df['date'] = pd.to_datetime(df['date'])
+    # 这个接口返回的数据成交量单位是"100"，需要乘以100
+    df['volume'] = df['volume'] * 100
+    # 按前缀拆分为4个市场的df分别处理
+    i = 0
+    for market, prefixes in market_prefixes_dict.items():
+        if flag[i] == '0':
+            continue
+        df0 = df[df['prefix'].isin(prefixes)].copy()
+        df0 = df0[['code', 'date', 'open', 'high', 'low', 'close', 'volume', 'turnover']]
+        table_name = market_table_dict[market]
+        df_append_2_local(table_name=table_name, df=df0)
+        i += 1
+        LOGGER.info(f'{date_str}, {market}同步数据完成, 数据条数: {df0.shape[0]}')
+    # 更新名称变化数据
+    sync_name_change(date_str, df[['code', 'name']])
+
+def web_interface_data_2_local(flag='1111'):
+    """
+    东财接口，被封IP了，暂不用
+    每日收盘后，通过网络接口获取数据，写入数据库
+    """
+    current_date = datetime.now().date()
+    date_str = current_date.strftime('%Y%m%d')
+    # 如果当天不是工作日，不操作
+    if not ChinaHolidayChecker.is_workday(current_date):
+        LOGGER.info(f'{current_date}不是工作日, 不操作')
+        return
+    # 进一步检查，判断指数是否有数据，指数有数据才运行
+    index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
+    if index_df.shape[0] == 0:
+        LOGGER.info(f'{current_date}指数无数据, 不操作')
+        return
+    # 如果所有市场今日已有数据，不再运行
+    # 查询4个市场数据最大日期
+    sql = """
+        SELECT 'sh_main' AS market, DATE_FORMAT(MAX(date), '%Y%m%d') AS max_date From bfq_daily_stock_price_sh_main
+        UNION
+        SELECT 'sh_kc' AS market, DATE_FORMAT(MAX(date), '%Y%m%d') AS max_date From bfq_daily_stock_price_sh_kc
+        UNION
+        SELECT 'sz_main' AS market, DATE_FORMAT(MAX(date), '%Y%m%d') AS max_date From bfq_daily_stock_price_sz_main
+        UNION
+        SELECT 'sz_cy' AS market, DATE_FORMAT(MAX(date), '%Y%m%d') AS max_date From bfq_daily_stock_price_sz_cy
+    """
+    max_date_rows = obtain_list_by_sql(sql)
+    market_prefixes_dict = {
+        'sh_main': {'60'},
+        'sh_kc': {'68'},
+        'sz_main': {'00'},
+        'sz_cy': {'30'}
+    }
+    market_table_dict = {
+        'sh_main': 'bfq_daily_stock_price_sh_main',
+        'sh_kc': 'bfq_daily_stock_price_sh_kc',
+        'sz_main': 'bfq_daily_stock_price_sz_main',
+        'sz_cy': 'bfq_daily_stock_price_sz_cy'
+    }
+
+    # 需要同步的前缀
+    sync_prefix_set = set()
+    for row in max_date_rows:
+        market = row[0]
+        max_date_str = row[1]
+        if max_date_str != date_str:
+            prefixes = market_prefixes_dict[market]
+            sync_prefix_set = sync_prefix_set.union(prefixes)
+    # 如果需要同步的前缀为空，跳过。（后面如果有需求，可以先查出表中当日数据，再把接口获取的数据去除掉已存在的，再插入表中）
+    if len(sync_prefix_set) == 0:
+        LOGGER.info(f'{date_str}已有数据, 不操作')
+        return
+
+    LOGGER.info(f'{date_str}, sync_prefix_set: {sync_prefix_set}')
+    # 定义中文到英文的列名映射
+    column_mapping = {
+        '代码': 'code',
+        '名称': 'name',
+        '最新价': 'close',  # 最新价作为close
+        '涨跌额': 'change_amount',
+        '涨跌幅': 'change_rate',
+        '买入': 'buy',
+        '卖出': 'sell',
+        '昨收': 'previous_close',
+        '今开': 'open',
+        '最高': 'high',
+        '最低': 'low',
+        '成交量': 'volume',
+        '成交额': 'turnover',
+        '时间戳': 'timestamp'
+    }
+    # 定义数据类型映射
+    dtype_dict = {
+        'code': 'str',
+        'name': 'str',
+        'close': 'float64',
+        'change_rate': 'float64',
+        'change_amount': 'float64',
+        'volume': 'float64',
+        'turnover': 'float64',
+        'high': 'float64',
+        'low': 'float64',
+        'open': 'float64',
+        'previous_close': 'float64'
+    }
+
+    # 查询当日数据
+    df = ak.stock_zh_a_spot()
+    LOGGER.info(f'{date_str}, df size: {df.shape[0]}')
+    df.rename(columns=column_mapping, inplace=True)
+    # 去掉值为空的
+    df = df[pd.notna(df["open"])].copy()
+    if df.shape[0] == 0:
+        LOGGER.info(f'{current_date}未获取到数据, 不操作')
+        return
+    # 转换类型
+    df = df.astype(dtype_dict)
+    df['code'] = df['code'].astype('str').str['2:']
     df['name'] = df['name'].astype('str')
     # 只取在需同步前缀列表中的数据
     df['prefix'] = df['code'].str[:2]
