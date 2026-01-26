@@ -444,10 +444,10 @@ def web_interface_data_2_local(flag='1111'):
     #     LOGGER.info(f'{current_date}不是工作日, 不操作')
     #     return
     # 进一步检查，判断指数是否有数据，指数有数据才运行
-    index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
-    if index_df.shape[0] == 0:
-        LOGGER.info(f'{current_date}指数无数据, 不操作')
-        return
+    # index_df = ak.stock_zh_index_daily_em(symbol="sh000001", start_date=date_str, end_date=date_str)
+    # if index_df.shape[0] == 0:
+    #     LOGGER.info(f'{current_date}指数无数据, 不操作')
+    #     return
     # 如果所有市场今日已有数据，不再运行
     # 查询4个市场数据最大日期
     sql = """
