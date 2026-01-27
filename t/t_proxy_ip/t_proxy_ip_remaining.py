@@ -1,5 +1,8 @@
 import requests
 
+from utils.proxy_ip_util import balance_api_url
+
+
 # 查询余额
 def get_proxy_balance(balance_api_url):
     """
@@ -25,6 +28,5 @@ def get_proxy_balance(balance_api_url):
         return None
 
 if __name__ == '__main__':
-    balance_api_url = 'https://share.proxy.qg.net/balance?key=42FGHZSM'
     initial_balance = get_proxy_balance(balance_api_url)
     print(f'代理IP余额: {initial_balance}')
