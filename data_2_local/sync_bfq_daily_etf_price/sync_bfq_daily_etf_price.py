@@ -1,6 +1,9 @@
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from utils import proxy_retry_patch
+import requests
 from datetime import datetime
 
 import pandas as pd
@@ -312,3 +315,4 @@ if __name__ == '__main__':
     # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20260113', start_date_str=None, end_date_str='20260112')
     daily_data_2_local()
     # LOGGER.info('xxx')
+    # df = ak.fund_etf_spot_em()
