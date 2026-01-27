@@ -1,0 +1,11 @@
+[Unit]
+Description=sync_bfq_daily_etf_price service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_etf_price
+ExecStart=/bin/bash /home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_etf_price/sync_bfq_daily_etf_price.sh
+User=arrow
+
+[Install]
+WantedBy=multi-user.target

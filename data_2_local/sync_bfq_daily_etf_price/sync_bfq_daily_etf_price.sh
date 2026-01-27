@@ -4,4 +4,4 @@
 VENV_PATH="/home/arrow/code/invest/takshare/.venv"
 
 # 直接使用虚拟环境中的Python解释器
-"$VENV_PATH/bin/python" /home/arrow/code/invest/takshare/data_2_local/bfq_daily_etf_price_2_local.py
+"$VENV_PATH/bin/python" /home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_etf_price/sync_bfq_daily_etf_price.py
