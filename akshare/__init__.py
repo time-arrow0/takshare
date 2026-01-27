@@ -3219,29 +3219,17 @@ amac_manager_cancelled_info # 中国证券投资基金业协会-信息公示-诚
 1.18.11 fix: fix stock_individual_spot_xq interface
 1.18.12 fix: fix news_economic_baidu interface
 1.18.13 fix: fix futures_spot_price_daily interface
+1.18.14 fix: fix fund_etf_scale_szse interface
+1.18.15 fix: fix fund_etf_scale_sse interface
+1.18.16 fix: fix news_economic_baidu interface
+1.18.17 fix: fix stock_individual_spot_xq interface
+1.18.18 fix: fix stock_individual_spot_xq interface
+1.18.19 fix: fix github action
+1.18.20 fix: fix stock_individual_spot_xq interface
 """
 
-__version__ = "1.18.13"
+from akshare._version import __version__
 __author__ = "AKFamily"
-
-import sys
-import warnings
-
-import pandas as pd
-
-pd_main_version = int(pd.__version__.split('.')[0])
-
-if pd_main_version < 2:
-    warnings.warn(
-        "为了支持更多特性，请将 Pandas 升级到 2.2.0 及以上版本！"
-    )
-
-if sys.version_info < (3, 9):
-    warnings.warn(
-        "为了支持更多特性，请将 Python 升级到 3.9.0 及以上版本！"
-    )
-
-del sys
 
 """
 openctp-合约信息接口
@@ -3286,12 +3274,20 @@ from akshare.stock.stock_profile_em import stock_hk_dividend_payout_em, stock_hk
 """
 东方财富-港股-行业对比
 """
-from akshare.stock.stock_hk_comparison_em import stock_hk_growth_comparison_em, stock_hk_valuation_comparison_em, stock_hk_scale_comparison_em
+from akshare.stock.stock_hk_comparison_em import (
+    stock_hk_growth_comparison_em,
+    stock_hk_valuation_comparison_em,
+    stock_hk_scale_comparison_em
+)
 
 """
 东方财富-行情中心-同行比较
 """
-from akshare.stock.stock_zh_comparison_em import stock_zh_growth_comparison_em, stock_zh_valuation_comparison_em, stock_zh_dupont_comparison_em, stock_zh_scale_comparison_em
+from akshare.stock.stock_zh_comparison_em import (stock_zh_growth_comparison_em,
+                                                  stock_zh_valuation_comparison_em,
+                                                  stock_zh_dupont_comparison_em,
+                                                  stock_zh_scale_comparison_em
+                                                  )
 
 """
 东方财富网-行情中心-债券市场-质押式回购
@@ -3302,15 +3298,6 @@ from akshare.bond.bond_buy_back_em import bond_sh_buy_back_em, bond_sz_buy_back_
 东方财富-A股数据-股本结构
 """
 from akshare.stock_fundamental.stock_gbjg_em import stock_zh_a_gbjg_em
-
-"""
-异步接口
-"""
-from akshare.stock_a.stock_zh_a_spot import stock_zh_a_spot_em as stock_zh_a_spot_em_async
-from akshare.stock_a.stock_individual_fund_flow_rank import (
-    stock_individual_fund_flow_rank as stock_individual_fund_flow_rank_async
-)
-from akshare.stock_a.stock_board_concept_name_em import stock_board_concept_name_em as stock_board_concept_name_em_async
 
 """
 雪球-个股-公司概况-公司简介
@@ -3703,6 +3690,16 @@ from akshare.fund.fund_etf_em import (
 )
 
 """
+上海证券交易所-ETF基金份额数据
+"""
+from akshare.fund.fund_etf_sse import fund_etf_scale_sse
+
+"""
+深圳证券交易所-ETF基金份额数据
+"""
+from akshare.fund.fund_etf_szse import fund_etf_scale_szse
+
+"""
 乐咕乐股-股债利差
 """
 from akshare.stock_feature.stock_ebs_lg import stock_ebs_lg
@@ -3830,7 +3827,6 @@ from akshare.stock_feature.stock_hk_valuation_baidu import stock_hk_valuation_ba
 """
 from akshare.stock_feature.stock_us_valuation_baidu import stock_us_valuation_baidu
 
-
 """
 巨潮资讯-个股-公司概况
 """
@@ -3888,6 +3884,7 @@ from akshare.option.option_risk_indicator_sse import option_risk_indicator_sse
 期权-上海证券交易所-当日合约
 """
 from akshare.option.option_risk_indicator_sse import option_risk_indicator_sse
+
 """
 
 全球宏观事件
@@ -5302,6 +5299,7 @@ from akshare.index.index_yw import index_yw
 股票指数-股票指数-中证指数列表
 """
 from akshare.index.index_csindex import index_csindex_all
+
 """
 
 股票指数-股票指数-成份股
