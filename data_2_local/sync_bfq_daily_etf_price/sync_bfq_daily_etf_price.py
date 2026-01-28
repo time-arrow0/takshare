@@ -313,6 +313,10 @@ if __name__ == '__main__':
 
     # initial_tdx_file_data_2_local()
     # tdx_file_data_2_local('D:/new_tdx/T0002/export/bfq-etf-20260113', start_date_str=None, end_date_str='20260112')
-    daily_data_2_local()
+    try:
+        daily_data_2_local()
+    except Exception as e:
+        LOGGER.error(e)
+
     # LOGGER.info('xxx')
     # df = ak.fund_etf_spot_em()

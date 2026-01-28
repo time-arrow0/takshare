@@ -562,5 +562,10 @@ if __name__ == '__main__':
     # tdx_file_data_2_local(t_dir)
     # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260128'
     # tdx_file_single_date_data_2_local(t_dir, '20260126')
-    web_interface_data_2_local_em()
+
+    try:
+        web_interface_data_2_local_em()
+    except Exception as e:
+        LOGGER.error(e)
+
     # web_interface_data_2_local_sina()
