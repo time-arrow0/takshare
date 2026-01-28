@@ -162,9 +162,7 @@ def tdx_file_single_date_data_2_local(dir0, date_str, flag='1111'):
     # 代码在文件名中的截取范围
     code_start = 7
     code_end = 13  # 不包含
-    # 已完成的代码
-    complete_codes = obtain_complete_code_set('data/tdx_single_date_complete_codes.txt')
-    complete_code_set = set(complete_codes)
+
     sh_main_dfs = []
     sh_kc_dfs = []
     sz_main_dfs = []
@@ -175,8 +173,6 @@ def tdx_file_single_date_data_2_local(dir0, date_str, flag='1111'):
         if i % 100 == 0:
             print(f'进度: {i}/{n}')
         code = item[code_start: code_end]
-        if code in complete_code_set:
-            continue
         try:
             file_path = os.path.join(dir0, item)
             df = pd.read_csv(file_path,
@@ -208,7 +204,6 @@ def tdx_file_single_date_data_2_local(dir0, date_str, flag='1111'):
             else:
                 LOGGER.info(f'{code}, 未找到符合前缀{prefix}的表')
                 continue
-            append_2_complete_codes_file(code=code, file_path='data/tdx_single_date_complete_codes.txt')
         except Exception as e:
             s = f'{code}保存出错'
             LOGGER.error(s)
