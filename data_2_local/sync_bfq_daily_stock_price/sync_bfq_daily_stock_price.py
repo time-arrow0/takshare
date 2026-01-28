@@ -530,7 +530,8 @@ def web_interface_data_2_local_sina(flag='1111'):
         return
     # 转换类型
     df = df.astype(dtype_dict)
-    df['code'] = df['code'].astype('str').str['2:']
+    df['code'] = df['code'].astype('str')
+    df['code'] = df['code'].str[2:]
     df['name'] = df['name'].astype('str')
     # 只取在需同步前缀列表中的数据
     df['prefix'] = df['code'].str[:2]
@@ -561,7 +562,7 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260112'
-    # tdx_file_single_date_data_2_local(t_dir, '20260107')
-    web_interface_data_2_local_em()
+    t_dir = '/home/arrow/code/data/bfq-sh-sz-20260128'
+    tdx_file_single_date_data_2_local(t_dir, '20260126')
+    # web_interface_data_2_local_em()
     # web_interface_data_2_local_sina()
