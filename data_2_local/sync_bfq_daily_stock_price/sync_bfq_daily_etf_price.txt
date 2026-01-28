@@ -1,0 +1,16 @@
+command:
+
+sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_stock_price/sync_bfq_daily_stock_price.service /etc/systemd/system/sync_bfq_daily_stock_price.service
+# sudo ln -s /home/arrow/code/invest/takshare/data_2_local/sync_bfq_daily_stock_price/sync_bfq_daily_stock_price.timer /etc/systemd/system/sync_bfq_daily_stock_price.timer
+
+sudo systemctl daemon-reload
+
+# sudo systemctl restart sync_bfq_daily_stock_price.timer
+
+sudo systemctl enable sync_bfq_daily_stock_price.service
+# sudo systemctl enable sync_bfq_daily_stock_price.timer
+
+sudo systemctl status sync_bfq_daily_stock_price.service
+# sudo systemctl status sync_bfq_daily_stock_price.timer
+
+# sudo systemctl list-timers --all --no-pager
