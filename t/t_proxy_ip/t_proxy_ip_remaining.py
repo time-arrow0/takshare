@@ -1,6 +1,8 @@
 import requests
 
-from utils.proxy_ip_util import balance_api_url
+proxy_key = 'G2IUJ5LX'
+api_url = f"https://share.proxy.qg.net/get?key={proxy_key}&num=1&area=&isp=0&format=json&distinct=true"
+balance_api_url = f'https://share.proxy.qg.net/balance?key={proxy_key}'
 
 
 # 查询余额

@@ -1,6 +1,8 @@
 import requests
 
-from utils.proxy_ip_util import api_url
+proxy_key = 'G2IUJ5LX'
+api_url = f"https://share.proxy.qg.net/get?key={proxy_key}&num=1&area=&isp=0&format=json&distinct=true"
+balance_api_url = f'https://share.proxy.qg.net/balance?key={proxy_key}'
 
 
 def get_valid_proxy(proxy_api_url: str=api_url) -> dict:
