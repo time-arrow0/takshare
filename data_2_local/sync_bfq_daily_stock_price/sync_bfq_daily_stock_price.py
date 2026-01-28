@@ -2,6 +2,9 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from utils import proxy_retry_patch
+import requests
+
 from utils.web_interface_obtain_data import baostock_obtain_daily
 from data_2_local.sync_stock_name_change.sync_stock_name_change import sync_name_change
 import time
@@ -557,7 +560,7 @@ if __name__ == '__main__':
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sh-20251226'
     # t_dir = 'D:/new_tdx/T0002/export/bfq-sz-20251226'
     # tdx_file_data_2_local(t_dir)
-    t_dir = '/home/arrow/code/data/bfq-sh-sz-20260128'
-    tdx_file_single_date_data_2_local(t_dir, '20260126')
-    # web_interface_data_2_local_em()
+    # t_dir = '/home/arrow/code/data/bfq-sh-sz-20260128'
+    # tdx_file_single_date_data_2_local(t_dir, '20260126')
+    web_interface_data_2_local_em()
     # web_interface_data_2_local_sina()
